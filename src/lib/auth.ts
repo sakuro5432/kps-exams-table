@@ -6,6 +6,7 @@ import { MyKuUserTokenInterface } from "../types/signIn.types";
 
 export async function Auth(noCondition: boolean = false) {
   const session = await getServerSession(authOptions);
+  if (!session || session.user.forceLogout) return null
   return session;
 }
 
