@@ -9,7 +9,7 @@ interface Props {
 }
 
 export function RequestUpdateButton({ isRequestable }: Props) {
-  const [isDisabled, setIsDisabled] = useState(isRequestable.disabled);
+  const [isDisabled, setIsDisabled] = useState(process.env.NODE_ENV === "production" ? isRequestable.disabled : false);
 
   const handleClick = async () => {
     setIsDisabled(true);

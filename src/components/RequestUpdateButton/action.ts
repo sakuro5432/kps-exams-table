@@ -3,6 +3,7 @@ import { Auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { collectAndSaveMyCourse } from "@/controllers/collectAndSaveMyCourse.controller";
 import { revalidatePath } from "next/cache";
+import { envServer } from "@/env/server.mjs";
 
 export async function action() {
   try {
@@ -23,7 +24,11 @@ export async function action() {
       orderBy: { createdAt: "desc" },
     });
 
-    if (lastRequest && lastRequest.createdAt) {
+    if (
+      envServer.NODE_ENV === "production" &&
+      lastRequest &&
+      lastRequest.createdAt
+    ) {
       const now = Date.now();
       const lastTime = new Date(lastRequest.createdAt).getTime();
 
