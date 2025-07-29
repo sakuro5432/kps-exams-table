@@ -21,7 +21,7 @@ const ExamSchema = new mongoose.Schema({
   sectionId: { type: Number, required: true },
   studentIdRange: { type: String, default: null },
   isTimeDuplicate: { type: Boolean, default: false },
-});
+}, { _id: false });
 
 const UserExamSchema = new mongoose.Schema({
   stdCode: {
@@ -35,7 +35,7 @@ const UserExamSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-});
+}, { _id: false });
 
 UserExamSchema.index({ createdAt: 1 }, { expires: 15 * 60 });
 
