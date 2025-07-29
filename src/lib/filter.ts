@@ -60,14 +60,18 @@ export function filterExamScheduleByStudent(
 
   return todo
     .map((x): MatchedExamType | null => {
-      const course = data.find(
-        (course) =>
-          course.subjectCode.startsWith(x.subjectCode) &&
+      const course = data.find((course) => {
+        const registeredSubjectCode = course.subjectCode.replace(/–/g, "-");
+        const examSubjectCode = x.subjectCode.replace(/–/g, "-");
+
+        return (
+          registeredSubjectCode.startsWith(examSubjectCode) &&
           x.sectionCode
             .split(",")
             .map((s) => s.trim())
             .includes(course.sectionCode)
-      );
+        );
+      });
 
       if (!course) return null;
 
