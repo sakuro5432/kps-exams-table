@@ -5,6 +5,7 @@ import { Prisma } from "@/lib/generated/prisma";
 import { getMyCourse } from "./getMyCourse.controller";
 import { uniqueBy } from "@/lib/utils";
 import UserExamModel from "@/mongoose/model/UserExamSchema";
+import { envServer } from "@/env/server.mjs";
 
 export async function collectAndSaveMyCourse(stdCode: string, token: string) {
   try {
@@ -71,34 +72,35 @@ export async function collectAndSaveMyCourse(stdCode: string, token: string) {
     await prisma.$transaction(operations);
 
     // STEP 2: ดึงข้อมูลใหม่อีกครั้ง (อาจลบ step นี้หากไม่จำเป็น)
-    myCourse = await getMyCourse(stdCode, token);
-    if (!myCourse || myCourse.length === 0) {
+    let myCourse2 = await getMyCourse(stdCode, token);
+    if (!myCourse2 || myCourse2.length === 0) {
       throw new Error("No course data available to save.");
     }
 
     // กรองข้อมูลซ้ำ
-    myCourse = uniqueBy(myCourse, (x) => x.sectionId);
+    myCourse2 = uniqueBy(myCourse2, (x) => x.sectionId);
 
-    const subjectCodes = [
-      ...new Set(myCourse.map((x) => x.subjectCode.split("-")[0])),
-    ]; // remove duplicate subject codes by extracting the code before '-' for each course
-
+    const subjectCodes = myCourse2.map((x) => ({
+      sectionCode: x.sectionCode,
+      subjectCodes: x.subjectCode.replace(/-.*/, ""),
+    }));
     const examSchedules = await prisma.examSchedule.findMany({
       where: {
         OR: subjectCodes.map((code) => ({
           subjectCode: {
-            startsWith: code,
+            startsWith: code.subjectCodes,
           },
+          sectionCode: { contains: code.sectionCode },
         })),
       },
     });
-
+    // console.log(examSchedules) // after this is missing `01355103`
     const matched = filterExamScheduleByStudent(
       examSchedules,
-      myCourse,
+      myCourse2,
       stdCode
     );
-
+    // console.log(matched);
     const dataToCreate = matched.map((x) => ({
       stdCode,
       examScheduleId: x.id,
@@ -110,7 +112,10 @@ export async function collectAndSaveMyCourse(stdCode: string, token: string) {
         data: dataToCreate,
         skipDuplicates: true, // ป้องกัน insert ซ้ำ (ควรมี unique constraint ด้วย)
       });
-      await UserExamModel.deleteMany({ stdCode });
+
+      if (envServer.NODE_ENV == "production") {
+        await UserExamModel.deleteMany({ stdCode });
+      }
     }
   } catch (error) {
     console.error("Detailed error in collectAndSaveMyCourse:", error);
