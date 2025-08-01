@@ -7,7 +7,13 @@ import { Props } from "./types";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { schema } from "./schema.z";
-import { startTransition, useActionState, useEffect, useState } from "react";
+import {
+  startTransition,
+  useActionState,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { update } from "./update";
 import { toast } from "sonner";
 
@@ -18,13 +24,16 @@ export default function NoteEditor({
   "form" | "onSubmit" | "isDisabled" | "isSubmit" | "setOpen" | "open"
 >) {
   const [open, setOpen] = useState(false);
-  const [defaultValues, setDefaultValues] = useState<{
+  const defaultValues = useMemo<{
     userExamId: string;
     note: string;
-  }>({
-    userExamId: data.id,
-    note: data.note || "",
-  });
+  }>(
+    () => ({
+      userExamId: data.id,
+      note: data.note || "",
+    }),
+    []
+  );
   // const query = useQuery({
   //   queryKey: [`note${data.id}`],
   //   queryFn: () => getNote(data.id),
@@ -55,6 +64,11 @@ export default function NoteEditor({
     if (formState !== null) {
       if (formState.code === "SUCCESS") {
         toast.success(formState.message);
+        // รีเซ็ต form ด้วยค่าปัจจุบัน (note ที่เพิ่งอัปเดต)
+        form.reset({
+          userExamId: data.id,
+          note: currentValues.note,
+        });
       } else {
         toast.error(formState.message, { description: "โปรดลองใหม่อีกครั้ง" });
       }

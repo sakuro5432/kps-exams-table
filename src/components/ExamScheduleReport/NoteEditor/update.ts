@@ -4,6 +4,8 @@ import { Auth } from "@/lib/auth";
 import { schema } from "./schema.z";
 import { prisma } from "@/lib/db";
 import { revalidatePath } from "next/cache";
+import UserExamModel from "@/mongoose/model/UserExamSchema";
+import { envServer } from "@/env/server.mjs";
 
 type ResponseCode =
   | "UNAUTHORIZED"
@@ -72,11 +74,23 @@ export async function update(
         await tx.userExamNote.update({
           where: {
             userExamId,
+            stdCode,
           },
           data: {
             note: note || null,
           },
         });
+      }
+      if (envServer.NODE_ENV === "production") {
+        const cache = await UserExamModel.findOne({ stdCode });
+        if (cache) {
+          const s = cache.exams.findIndex((x) => x.id === userExamId);
+          if (s !== -1) {
+            cache.exams[s].note = note || null;
+            cache.markModified("exams");
+            await cache.save();
+          }
+        }
       }
       revalidatePath("/exams");
       return { message: "บันทึกสำเร็จ", code: "SUCCESS" };
