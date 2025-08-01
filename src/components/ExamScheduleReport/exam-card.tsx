@@ -2,7 +2,7 @@ import { ExamScheduleType } from "@/types/schedule.types";
 import { Badge } from "../ui/badge";
 import NoteEditor from "./NoteEditor";
 import { BadgeSectionCode } from "./badge-sectionCode";
-import DeleteButton from "./DeleteButton";
+// import DeleteButton from "./DeleteButton";
 
 interface Props {
   data: ExamScheduleType;
