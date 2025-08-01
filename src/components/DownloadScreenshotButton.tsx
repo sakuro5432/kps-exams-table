@@ -67,7 +67,7 @@ export function DownloadScreenshotButton({ contentRef }: Props) {
   };
 
   return (
-    <Button type="button" className="xl:w-fit w-1/2" onClick={downloadFn}>
+    <Button type="button" onClick={downloadFn}>
       <DownloadIcon className="mr-2" />
       ดาวน์โหลด
     </Button>

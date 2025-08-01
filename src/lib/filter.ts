@@ -3,7 +3,7 @@ import { ExamSchedule } from "@/lib/generated/prisma";
 
 export function groupByDate<T extends { dateTh: string; time: string }>(
   items: T[]
-): Record<string, (T & { isTimeDuplicate?: boolean })[]> {
+): { label: string; items: (T & { isTimeDuplicate?: boolean })[] }[] {
   const grouped = items.reduce((acc, item) => {
     if (!acc[item.dateTh]) {
       acc[item.dateTh] = [];
@@ -12,7 +12,6 @@ export function groupByDate<T extends { dateTh: string; time: string }>(
     return acc;
   }, {} as Record<string, (T & { isTimeDuplicate?: boolean })[]>);
 
-  // ฟังก์ชันแปลงเวลาเริ่มต้นเป็นนาที
   const getStartEnd = (time: string) => {
     const [start, end] = time.split("-").map((t) => t.trim());
     const toMinutes = (t: string) => {
@@ -27,11 +26,8 @@ export function groupByDate<T extends { dateTh: string; time: string }>(
 
   for (const date in grouped) {
     const exams = grouped[date];
-
-    // เรียงตามเวลาเริ่มต้น
     exams.sort((a, b) => getStartEnd(a.time).start - getStartEnd(b.time).start);
 
-    // ตรวจสอบเวลาทับซ้อน: ตั้ง isTimeDuplicate เฉพาะตัวถัดไปที่ทับกับก่อนหน้า
     for (let i = 1; i < exams.length; i++) {
       const current = getStartEnd(exams[i].time);
       for (let j = 0; j < i; j++) {
@@ -46,7 +42,11 @@ export function groupByDate<T extends { dateTh: string; time: string }>(
     }
   }
 
-  return grouped;
+  // แปลงจาก object -> array of { dateTh, items }
+  return Object.entries(grouped).map(([dateTh, items]) => ({
+    label: dateTh,
+    items,
+  }));
 }
 
 export function filterExamScheduleByStudent(

@@ -1,8 +1,8 @@
 export type RegisteredCourseType = {
   sectionId: number;
-  groupHeader: string;
-  weekStartDay: Date;
-  weekEndDay: Date;
+  // groupHeader: string;
+  // weekStartDay: Date;
+  // weekEndDay: Date;
   subjectCode: string;
   subjectNameTh: string;
   sectionCode: string;
@@ -29,6 +29,7 @@ export type ExamScheduleType = {
   sectionId: number;
   studentIdRange: string | null;
   isTimeDuplicate?: boolean;
+  note?: string | null;
 };
 export type MatchedExamType = ExamScheduleType & { subjectNameTh: string };
 export type CompleteExamScheduleDataType = {

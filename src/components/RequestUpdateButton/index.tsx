@@ -9,7 +9,9 @@ interface Props {
 }
 
 export function RequestUpdateButton({ isRequestable }: Props) {
-  const [isDisabled, setIsDisabled] = useState(process.env.NODE_ENV === "production" ? isRequestable.disabled : false);
+  const [isDisabled, setIsDisabled] = useState(
+    process.env.NODE_ENV === "production" ? isRequestable.disabled : false
+  );
 
   const handleClick = async () => {
     setIsDisabled(true);
@@ -29,7 +31,6 @@ export function RequestUpdateButton({ isRequestable }: Props) {
   return (
     <Button
       type="button"
-      className="xl:w-fit w-1/2"
       variant={"outline"}
       onClick={handleClick}
       disabled={isDisabled}

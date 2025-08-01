@@ -43,6 +43,7 @@ model User {
   Campus            Campus             @relation(fields: [campusCode], references: [campusCode])
   // Copen             Copen?             @relation(fields: [copenId], references: [copenId])
   UserReview        UserReview[]
+  UserExamNote      UserExamNote[]
 }
 
 // model Copen {
@@ -140,9 +141,6 @@ model RegisteredCourse {
 
 model CourseSchedule {
   sectionId     Int      @id
-  groupHeader   String   @db.VarChar(50)
-  weekStartDay  DateTime
-  weekEndDay    DateTime
   subjectCode   String   @db.VarChar(50)
   subjectNameTh String   @db.VarChar(100)
   sectionCode   String   @db.VarChar(10)
@@ -178,10 +176,22 @@ model UserExamSchedule {
   User           User           @relation(fields: [stdCode], references: [stdCode])
   ExamSchedule   ExamSchedule   @relation(fields: [examScheduleId], references: [id])
   CourseSchedule CourseSchedule @relation(fields: [sectionId], references: [sectionId])
+  UserExamNote   UserExamNote[]
 
   @@unique([stdCode, examScheduleId, sectionId])
   @@index([stdCode])
   @@index([examScheduleId])
+}
+
+model UserExamNote {
+  note             String?          @db.VarChar(50)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  deletedAt        DateTime?
+  userExamId       String           @id @db.VarChar(50)
+  stdCode          String           @db.VarChar(12)
+  User             User             @relation(fields: [stdCode], references: [stdCode])
+  UserExamSchedule UserExamSchedule @relation(fields: [userExamId], references: [id])
 }
 
 model RequestUpdate {

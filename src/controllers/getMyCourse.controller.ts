@@ -32,9 +32,6 @@ export async function getMyCourse(
     }
     return res.data.results[0].course.map((course) => ({
       sectionId: course.section_id, // Ensure this is unique
-      groupHeader: course.groupheader,
-      weekStartDay: new Date(course.weekstartday), // Convert to Date object
-      weekEndDay: new Date(course.weekendday), // Convert to Date object
       subjectCode: course.subject_code,
       subjectNameTh: course.subject_name_th,
       sectionCode: course.section_code,

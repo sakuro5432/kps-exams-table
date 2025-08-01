@@ -6,6 +6,7 @@ import { getMyCourse } from "./getMyCourse.controller";
 import { uniqueBy } from "@/lib/utils";
 import UserExamModel from "@/mongoose/model/UserExamSchema";
 import { envServer } from "@/env/server.mjs";
+import { getSubjectCodesFromCourses } from "@/lib/getSubjectCodesFromCourses";
 
 export async function collectAndSaveMyCourse(stdCode: string, token: string) {
   try {
@@ -72,18 +73,16 @@ export async function collectAndSaveMyCourse(stdCode: string, token: string) {
     await prisma.$transaction(operations);
 
     // STEP 2: ดึงข้อมูลใหม่อีกครั้ง (อาจลบ step นี้หากไม่จำเป็น)
-    let myCourse2 = await getMyCourse(stdCode, token);
-    if (!myCourse2 || myCourse2.length === 0) {
+    myCourse = await getMyCourse(stdCode, token);
+    if (!myCourse || myCourse.length === 0) {
       throw new Error("No course data available to save.");
     }
 
     // กรองข้อมูลซ้ำ
-    myCourse2 = uniqueBy(myCourse2, (x) => x.sectionId);
+    myCourse = uniqueBy(myCourse, (x) => x.sectionId);
 
-    const subjectCodes = myCourse2.map((x) => ({
-      sectionCode: x.sectionCode,
-      subjectCodes: x.subjectCode.replace(/-.*/, ""),
-    }));
+    const subjectCodes = getSubjectCodesFromCourses(myCourse);
+
     const examSchedules = await prisma.examSchedule.findMany({
       where: {
         OR: subjectCodes.map((code) => ({
@@ -94,13 +93,13 @@ export async function collectAndSaveMyCourse(stdCode: string, token: string) {
         })),
       },
     });
-    // console.log(examSchedules) // after this is missing `01355103`
+
     const matched = filterExamScheduleByStudent(
       examSchedules,
-      myCourse2,
+      myCourse,
       stdCode
     );
-    // console.log(matched);
+
     const dataToCreate = matched.map((x) => ({
       stdCode,
       examScheduleId: x.id,
