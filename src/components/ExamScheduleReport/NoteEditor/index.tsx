@@ -32,7 +32,7 @@ export default function NoteEditor({
       userExamId: data.id,
       note: data.note || "",
     }),
-    []
+    [data.note]
   );
   // const query = useQuery({
   //   queryKey: [`note${data.id}`],
@@ -65,10 +65,7 @@ export default function NoteEditor({
       if (formState.code === "SUCCESS") {
         toast.success(formState.message);
         // รีเซ็ต form ด้วยค่าปัจจุบัน (note ที่เพิ่งอัปเดต)
-        form.reset({
-          userExamId: data.id,
-          note: currentValues.note,
-        });
+        form.reset({ userExamId: data.id, note: data.note || "" });
       } else {
         toast.error(formState.message, { description: "โปรดลองใหม่อีกครั้ง" });
       }
