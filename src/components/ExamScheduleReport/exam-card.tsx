@@ -34,7 +34,7 @@ export function ExamCard({ data }: Props) {
         <div className="w-full">
           <div className="font-medium">Note:</div>
           <p className="text-sm text-muted-foreground break-words whitespace-pre-wrap">
-            {data.note?.trim() || "-"}
+            {data.note || "-"}
           </p>
         </div>
         <div className="flex justify-end flex-shrink-0 space-x-1">
