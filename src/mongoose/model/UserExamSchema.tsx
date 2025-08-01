@@ -21,6 +21,7 @@ const ExamSchema = new mongoose.Schema({
   sectionId: { type: Number, required: true },
   studentIdRange: { type: String, default: null },
   isTimeDuplicate: { type: Boolean, default: false },
+  note:{ type:String, default: null}
 }, { _id: false });
 
 const UserExamSchema = new mongoose.Schema({

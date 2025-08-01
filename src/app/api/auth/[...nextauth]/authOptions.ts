@@ -1,3 +1,4 @@
+import "server-only";
 import NextAuth, {
   User as UserDataRequired,
   type NextAuthOptions,
@@ -11,6 +12,7 @@ import { collectAndSaveMyCourse } from "@/controllers/collectAndSaveMyCourse.con
 import { User as UserTable } from "@/lib/generated/prisma";
 import { referenceProcess, ReferenceType } from "./referenceName";
 import { signInSchema } from "@/zod/auth";
+import { envServer } from "@/env/server.mjs";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -215,6 +217,7 @@ export const authOptions: NextAuthOptions = {
     },
     session({ session, token }) {
       if (
+        envServer.NODE_ENV === "production" &&
         Math.floor(Date.now() / 1000) > Number(decodeJwt(token.accesstoken).exp)
       ) {
         session.user.forceLogout = true;

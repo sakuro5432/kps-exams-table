@@ -3,6 +3,7 @@ import { IBM_Plex_Sans_Thai } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import { cn } from "@/lib/utils";
+import Navbar from "@/components/Navbar";
 
 const font = IBM_Plex_Sans_Thai({
   subsets: ["latin", "thai"],
@@ -24,14 +25,15 @@ export default function RootLayout({
       <body className={cn("antialiased", font.className)}>
         <Providers>
           <main className="min-h-screen xl:px-96 py-4 px-4 w-full">
+            <Navbar />
             {children}
           </main>
+          <footer className="bg-primary text-white text-center p-2">
+            <a href="https://discord.gg/P5snQfWB" className="underline">
+              แจ้งปัญหา / อัพเดทข้อมูล ทาง Discord
+            </a>
+          </footer>
         </Providers>
-        <footer className="bg-primary text-white text-center p-2">
-          <a href="https://discord.gg/P5snQfWB" className="underline">
-            แจ้งปัญหา / อัพเดทข้อมูล ทาง Discord
-          </a>
-        </footer>
       </body>
     </html>
   );

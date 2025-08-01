@@ -5,9 +5,9 @@ export interface GroupCourseResponseInterface {
 
 interface Course {
   section_id: number;
-  groupheader: string;
-  weekstartday: string;
-  weekendday: string;
+  // groupheader: string;
+  // weekstartday: string;
+  // weekendday: string;
   std_id: string;
   subject_code: string;
   subject_name_th: string;

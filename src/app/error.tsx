@@ -11,7 +11,9 @@ export default function error({
 }) {
   return (
     <div>
-      Error : {error.message}
+      <div>
+        Error : {error.message}
+      </div>
       <Button onClick={reset}>โปรดลองใหม่อีกครั้ง</Button>
     </div>
   );

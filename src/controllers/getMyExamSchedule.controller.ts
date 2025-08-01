@@ -1,18 +1,17 @@
 import "server-only";
 import { prisma } from "../lib/db";
-import { ExamScheduleType } from "@/types/schedule.types";
 import { groupByDate } from "../lib/filter";
 import UserExamModel from "@/mongoose/model/UserExamSchema";
 import mongoConnect from "@/lib/mongoose";
 import { envServer } from "@/env/server.mjs";
+import { ExamScheduleType } from "@/types/schedule.types";
+
 
 export async function getMyExamSchedule(stdCode: string): Promise<{
-  data: Record<
-    string,
-    (ExamScheduleType & {
-      isTimeDuplicate?: boolean;
-    })[]
-  >;
+  data: {
+    label: string;
+    items: ExamScheduleType[];
+  }[];
   requestUpdateAt: Date | null;
 }> {
   await mongoConnect();
@@ -46,13 +45,14 @@ export async function getMyExamSchedule(stdCode: string): Promise<{
   };
 }
 
-async function getUserExamSchedule(
-  stdCode: string
-): Promise<ExamScheduleType[]> {
+async function getUserExamSchedule(stdCode: string): Promise<ExamScheduleType[]> {
   return (
     await prisma.userExamSchedule.findMany({
       where: { stdCode },
       include: {
+        UserExamNote: {
+          take: 1,
+        },
         CourseSchedule: {
           select: {
             subjectCode: true,
@@ -88,6 +88,7 @@ async function getUserExamSchedule(
           ...rest,
           ...CourseSchedule,
           ...ExamSchedule,
+          note: rest.UserExamNote.at(0)?.note || null,
         } as ExamScheduleType)
     )
     .sort((a, b) => Number(a.date) - Number(b.date));

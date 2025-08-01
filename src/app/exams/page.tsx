@@ -15,7 +15,6 @@ export default async function Page() {
   const { stdCode } = isAuth.user.studentInfo;
   const { data, requestUpdateAt } = await getMyExamSchedule(stdCode);
   const cooldownStatus = checkRequestCooldown(requestUpdateAt);
-
   return (
     <div className="space-y-5">
       <ExamScheduleReport
