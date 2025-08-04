@@ -2,10 +2,8 @@
 import { Toaster } from "@/components/ui/sonner";
 import { SessionProvider } from "next-auth/react";
 import React from "react";
-import {
-  QueryClient,
-  QueryClientProvider,
-} from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { refetchOnWindowFocus: false } },
@@ -16,12 +14,14 @@ interface Props {
 }
 export function Providers({ children }: Props) {
   return (
-    <SessionProvider>
-      <QueryClientProvider client={queryClient}>
-        <Toaster position="top-center" richColors />
+    <NuqsAdapter>
+      <SessionProvider>
+        <QueryClientProvider client={queryClient}>
+          <Toaster position="top-center" richColors />
 
-        {children}
-      </QueryClientProvider>
-    </SessionProvider>
+          {children}
+        </QueryClientProvider>
+      </SessionProvider>
+    </NuqsAdapter>
   );
 }
