@@ -1,0 +1,9 @@
+-- AlterTable
+ALTER TABLE `ExamSchedule` ADD COLUMN `reportBy` ENUM('ADMIN', 'STUDENT') NOT NULL DEFAULT 'STUDENT',
+    ADD COLUMN `stdCode` VARCHAR(12) NULL;
+
+-- AlterTable
+ALTER TABLE `User` ADD COLUMN `role` ENUM('ADMIN', 'STUDENT') NOT NULL DEFAULT 'STUDENT';
+
+-- AddForeignKey
+ALTER TABLE `ExamSchedule` ADD CONSTRAINT `ExamSchedule_stdCode_fkey` FOREIGN KEY (`stdCode`) REFERENCES `User`(`stdCode`) ON DELETE SET NULL ON UPDATE CASCADE;

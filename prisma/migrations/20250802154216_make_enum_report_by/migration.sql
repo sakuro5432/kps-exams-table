@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `ExamSchedule` MODIFY `reportBy` ENUM('SYSTEM', 'ADMIN', 'STUDENT') NOT NULL DEFAULT 'STUDENT';
