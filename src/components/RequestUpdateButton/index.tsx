@@ -34,6 +34,7 @@ export function RequestUpdateButton({ isRequestable }: Props) {
       variant={"outline"}
       onClick={handleClick}
       disabled={isDisabled}
+      className="w-full"
     >
       <LucideClockFading className="mr-2" />
       อัปเดตข้อมูล{" "}
