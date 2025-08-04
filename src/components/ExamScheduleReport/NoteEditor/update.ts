@@ -4,8 +4,9 @@ import { Auth } from "@/lib/auth";
 import { schema } from "./schema.z";
 import { prisma } from "@/lib/db";
 import { revalidatePath } from "next/cache";
-import UserExamModel from "@/mongoose/model/UserExamSchema";
-import { envServer } from "@/env/server.mjs";
+import UserExamModel from "@/mongoose/model/UserExam";
+import LogModel, { LogAction } from "@/mongoose/model/Log";
+import { TableSource } from "@/mongoose/enum/TableSource";
 
 type ResponseCode =
   | "UNAUTHORIZED"
@@ -37,7 +38,7 @@ export async function update(
         code: "INVALID_FORM",
       };
     }
-    const { stdCode } = isAuth.user.studentInfo;
+    const { stdCode } = isAuth;
     const { userExamId, note } = validForm.data;
 
     const search = await prisma.userExamNote.findUnique({
@@ -63,7 +64,7 @@ export async function update(
         },
       });
       if (!existingNote) {
-        await tx.userExamNote.create({
+        const created = await tx.userExamNote.create({
           data: {
             userExamId,
             note: note || null,
@@ -81,17 +82,26 @@ export async function update(
           },
         });
       }
-      if (envServer.NODE_ENV === "production") {
-        const cache = await UserExamModel.findOne({ stdCode });
-        if (cache) {
-          const s = cache.exams.findIndex((x) => x.id === userExamId);
-          if (s !== -1) {
-            cache.exams[s].note = note || null;
-            cache.markModified("exams");
-            await cache.save();
-          }
+
+      const cache = await UserExamModel.findOne({ stdCode });
+      if (cache) {
+        const s = cache.exams.findIndex((x) => x.id === userExamId);
+        if (s !== -1) {
+          cache.exams[s].note = note || null;
+          cache.markModified("exams");
+          await cache.save();
         }
       }
+      await LogModel.create({
+        stdCode,
+        action: LogAction.USER_EXAM_NOTE_UPDATE,
+        tableSource: TableSource.USER_EXAM_NOTE,
+        pkid: userExamId,
+        dataJson: JSON.stringify({
+          note: note || null,
+        }),
+      });
+
       revalidatePath("/exams");
       return { message: "บันทึกสำเร็จ", code: "SUCCESS" };
     });

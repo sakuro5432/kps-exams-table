@@ -41,7 +41,7 @@ export function Mobile({
   return (
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-        <Button size={"icon"} variant={"outline"}>
+        <Button size={"icon"} variant={"outline"} className="export-hidden">
           <Pencil2Icon />
         </Button>
       </DrawerTrigger>
