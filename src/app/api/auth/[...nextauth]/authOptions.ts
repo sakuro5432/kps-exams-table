@@ -8,11 +8,13 @@ import { app } from "@/lib/myku";
 import { AxiosError } from "axios";
 import { prisma } from "@/lib/db";
 import { decodeJwt } from "jose";
-import { collectAndSaveMyCourse } from "@/controllers/collectAndSaveMyCourse.controller";
+import { revalidateMyCourse } from "@/controllers/revalidateMyCourse.controller";
 import { User as UserTable } from "@/lib/generated/prisma";
 import { referenceProcess, ReferenceType } from "./referenceName";
 import { signInSchema } from "@/zod/auth";
 import { envServer } from "@/env/server.mjs";
+import LogModel, { LogAction } from "@/mongoose/model/Log";
+import mongoConnect from "@/mongoose/connect";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -109,7 +111,7 @@ export const authOptions: NextAuthOptions = {
 
           const basicInfo: Omit<
             UserTable,
-            "loggedCount" | "requestUpdateAt" | "createdAt"
+            "loggedCount" | "requestUpdateAt" | "createdAt" | "role"
           > = {
             stdCode: student.stdCode,
             loginName: student.loginName,
@@ -140,12 +142,12 @@ export const authOptions: NextAuthOptions = {
           }
           // --- END CHECKPOINT ON LOCAL SERVER
 
-          // คืน user object
           const user: UserDataRequired = {
             id: res.data.user.idCode,
             name: completeName,
             studentInfo: student,
             accesstoken: res.data.accesstoken,
+            role: findUser?.role || "STUDENT",
           };
           return user;
         } catch (error) {
@@ -192,35 +194,57 @@ export const authOptions: NextAuthOptions = {
     },
   },
   events: {
-    updateUser({ user }) {},
     async signIn({ user }) {
-      await prisma.user.update({
-        where: { stdCode: user.studentInfo.stdCode },
-        data: { loggedCount: { increment: 1 } },
-      });
-      const registeredCourse = await prisma.registeredCourse.count({
-        where: { stdCode: user.studentInfo.stdCode },
-      });
-      if (registeredCourse === 0) {
-        try {
-          await collectAndSaveMyCourse(
-            user.studentInfo.stdCode,
-            user.accesstoken
-          );
-        } catch (error) {
-          console.error("Error collecting and saving courses:", error);
+      try {
+        await mongoConnect();
+        await LogModel.create({
+          stdCode: user.studentInfo.stdCode,
+          action: LogAction.LOGIN,
+        });
+        await prisma.user.update({
+          where: { stdCode: user.studentInfo.stdCode },
+          data: { loggedCount: { increment: 1 } },
+        });
+        const registeredCourse = await prisma.registeredCourse.count({
+          where: { stdCode: user.studentInfo.stdCode },
+        });
+        if (registeredCourse === 0) {
+          try {
+            await revalidateMyCourse(
+              user.studentInfo.stdCode,
+              user.accesstoken
+            );
+          } catch (error) {
+            console.error("Error collecting and saving courses:", error);
+          }
         }
+      } catch (error) {
+        console.error("Error in signIn event:", error);
       }
     },
     async signOut({ session, token }) {
-      app.logout(token.studentInfo.loginName, token.accesstoken);
+      try {
+        await LogModel.create({
+          stdCode: token.studentInfo.stdCode,
+          action: LogAction.LOGOUT,
+        });
+        app.logout(token.studentInfo.loginName, token.accesstoken);
+      } catch (error) {
+        console.error("Error in signOut event:", error);
+      }
     },
-    session({ session, token }) {
-      if (
-        envServer.NODE_ENV === "production" &&
-        Math.floor(Date.now() / 1000) > Number(decodeJwt(token.accesstoken).exp)
-      ) {
-        session.user.forceLogout = true;
+    async session({ session, token }) {
+      try {
+        await mongoConnect();
+        if (
+          envServer.NODE_ENV === "production" &&
+          Math.floor(Date.now() / 1000) >
+            Number(decodeJwt(token.accesstoken).exp)
+        ) {
+          session.user.forceLogout = true;
+        }
+      } catch (error) {
+        console.error("Error in session event:", error);
       }
     },
   },

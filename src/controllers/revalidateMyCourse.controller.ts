@@ -4,11 +4,12 @@ import { filterExamScheduleByStudent } from "@/lib/filter";
 import { Prisma } from "@/lib/generated/prisma";
 import { getMyCourse } from "./getMyCourse.controller";
 import { uniqueBy } from "@/lib/utils";
-import UserExamModel from "@/mongoose/model/UserExamSchema";
+import UserExamModel from "@/mongoose/model/UserExam";
 import { envServer } from "@/env/server.mjs";
 import { getSubjectCodesFromCourses } from "@/lib/getSubjectCodesFromCourses";
+import mongoConnect from "@/mongoose/connect";
 
-export async function collectAndSaveMyCourse(stdCode: string, token: string) {
+export async function revalidateMyCourse(stdCode: string, token: string) {
   try {
     let myCourse = await getMyCourse(stdCode, token);
 
@@ -36,6 +37,7 @@ export async function collectAndSaveMyCourse(stdCode: string, token: string) {
       where: {
         stdCode,
         sectionId: { in: sectionIds },
+        deletedAt: null,
       },
       select: { sectionId: true },
     });
@@ -82,14 +84,16 @@ export async function collectAndSaveMyCourse(stdCode: string, token: string) {
     myCourse = uniqueBy(myCourse, (x) => x.sectionId);
 
     const subjectCodes = getSubjectCodesFromCourses(myCourse);
-
+    // console.log(subjectCodes)
     const examSchedules = await prisma.examSchedule.findMany({
       where: {
         OR: subjectCodes.map((code) => ({
           subjectCode: {
             startsWith: code.subjectCodes,
           },
+          OR: [{ sectionType: code.sectionType }, { sectionType: null }],
           sectionCode: { contains: code.sectionCode },
+          deletedAt: null,
         })),
       },
     });
@@ -111,9 +115,11 @@ export async function collectAndSaveMyCourse(stdCode: string, token: string) {
         data: dataToCreate,
         skipDuplicates: true, // ป้องกัน insert ซ้ำ (ควรมี unique constraint ด้วย)
       });
-
       if (envServer.NODE_ENV == "production") {
-        await UserExamModel.deleteMany({ stdCode });
+        const isExists = await UserExamModel.findOne({ stdCode }).lean();
+        if (isExists) {
+          await UserExamModel.deleteOne({ stdCode });
+        }
       }
     }
   } catch (error) {

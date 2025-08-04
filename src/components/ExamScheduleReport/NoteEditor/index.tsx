@@ -32,13 +32,10 @@ export default function NoteEditor({
       userExamId: data.id,
       note: data.note || "",
     }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [data.note]
   );
-  // const query = useQuery({
-  //   queryKey: [`note${data.id}`],
-  //   queryFn: () => getNote(data.id),
-  //   enabled: open,
-  // });
+
   const isDesktop = useDesktop();
 
   const form = useForm({
@@ -71,40 +68,9 @@ export default function NoteEditor({
       }
     }
     setOpen(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formState]);
 
-  // useEffect(() => {
-  //   if (!query.isLoading && query.data !== null) {
-  //     const comment = query.data?.note ?? "";
-
-  //     setDefaultValues((prev) => ({
-  //       ...prev,
-  //       note: comment,
-  //     }));
-
-  //     // สำคัญ: อัปเดตค่าใน react-hook-form ด้วย
-  //     form.reset({
-  //       userExamId: data.id,
-  //       note: comment,
-  //     });
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [query.isLoading, query.data]);
-
-  // if (query.isLoading || query.isFetching) {
-  //   return (
-  //     <Button variant={"outline"} size={"icon"}>
-  //       ...
-  //     </Button>
-  //   );
-  // }
-
-  // if (query.isError) {
-  //   // query.error อาจเป็น unknown type ต้อง cast
-  //   const message =
-  //     query.error instanceof Error ? query.error.message : "เกิดข้อผิดพลาด";
-  //   return <div>{message}</div>;
-  // }
   if (isDesktop)
     return (
       <Desktop

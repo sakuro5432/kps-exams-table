@@ -9,5 +9,9 @@ export default function SignOutButton() {
       signOut();
     }
   };
-  return <Button onClick={logOut}>ออกจากระบบ</Button>;
+  return (
+    <Button onClick={logOut} variant={"outline"}>
+      ออกจากระบบ
+    </Button>
+  );
 }

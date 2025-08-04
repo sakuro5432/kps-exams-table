@@ -67,7 +67,7 @@ export function DownloadScreenshotButton({ contentRef }: Props) {
   };
 
   return (
-    <Button type="button" onClick={downloadFn}>
+    <Button type="button" onClick={downloadFn} className="w-full">
       <DownloadIcon className="mr-2" />
       ดาวน์โหลด
     </Button>

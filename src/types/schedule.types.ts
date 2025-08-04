@@ -22,6 +22,7 @@ export type ExamScheduleType = {
   room: string;
   subjectCode: string;
   subjectNameTh: string;
+  sectionType: string;
   dateTh: string;
   date: Date;
   time: string;

@@ -1,7 +1,8 @@
 import { ExamScheduleType } from "@/types/schedule.types";
 import { Badge } from "../ui/badge";
 import NoteEditor from "./NoteEditor";
-import { BadgeSectionCode } from "./badge-sectionCode";
+import { BadgeSectionCode } from "../BadgeSectionCode";
+import { sectionTypeTranslator } from "@/utils/section";
 // import DeleteButton from "./DeleteButton";
 
 interface Props {
@@ -15,21 +16,28 @@ export function ExamCard({ data }: Props) {
           พบเวลาสอบอาจทับซ้อนกัน
         </Badge>
       )}
+      {process.env.NODE_ENV === "development" && <div>#{data.sectionId}</div>}
       <div>
         เวลา: <span className="font-semibold">{data.time}</span>
       </div>
       <div>
+        ห้องสอบ: <span className="font-semibold">{data.room}</span>
+      </div>
+      <div>
         รหัสวิชา: <span className="font-semibold">{data.subjectCode}</span>
       </div>
-
+      <div className="font-medium">วิชา: {data.subjectNameTh}</div>
       <div className="flex items-start gap-1">
         <h1>หมู่เรียน: </h1>
         <BadgeSectionCode sectionCode={data.sectionCode} />
       </div>
-      <div className="font-medium">วิชา: {data.subjectNameTh}</div>
       <div>
-        ห้องสอบ: <span className="font-semibold">{data.room}</span>
+        รูปแบบการสอบ:{" "}
+        <span className="font-medium">
+          {sectionTypeTranslator(data.sectionType, true)}
+        </span>
       </div>
+      <div className="border-1"></div>
       <div className="">
         <div className="w-full">
           <div className="font-medium">Note:</div>

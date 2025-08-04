@@ -9,7 +9,6 @@ import {
 import { headers } from "./utils";
 import { MyKuQueryInstance } from "./query";
 import { envServer } from "@/env/server.mjs";
-import UserExamSchema from "@/mongoose/model/UserExamSchema";
 
 class MyKU {
   constructor() {}
@@ -48,7 +47,6 @@ class MyKU {
   }
   async logout(loginName: string, accesstoken: string) {
     // loginName start with b
-    // await UserExamSchema.deleteOne({ stdCode: loginName.replace("b", "") });
     return axios.post(
       "https://my.ku.th/myku/api/v2/user-login/logout",
       JSON.stringify({ loginName }),

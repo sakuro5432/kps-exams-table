@@ -9,10 +9,10 @@ import Link from "next/link";
 export default async function Page() {
   const isAuth = await Auth();
   if (!isAuth) return redirect("/login");
-  if (isAuth.user.forceLogout) {
+  if (isAuth.session.forceLogout) {
     return <ForceLogout />;
   }
-  const { stdCode } = isAuth.user.studentInfo;
+  const { stdCode } = isAuth.session.studentInfo;
   const { data, requestUpdateAt } = await getMyExamSchedule(stdCode);
   const cooldownStatus = checkRequestCooldown(requestUpdateAt);
   return (
@@ -20,11 +20,11 @@ export default async function Page() {
       <ExamScheduleReport
         isRequestable={cooldownStatus}
         metadata={{
-          name: isAuth.user.name,
-          stdCode: isAuth.user.studentInfo.stdCode,
-          facultyNameTh: isAuth.user.studentInfo.facultyNameTh,
-          majorNameTh: isAuth.user.studentInfo.majorNameTh,
-          studentStatusNameTh: isAuth.user.studentInfo.studentStatusNameTh,
+          name: isAuth.session.name,
+          stdCode: isAuth.session.studentInfo.stdCode,
+          facultyNameTh: isAuth.session.studentInfo.facultyNameTh,
+          majorNameTh: isAuth.session.studentInfo.majorNameTh,
+          studentStatusNameTh: isAuth.session.studentInfo.studentStatusNameTh,
         }}
         data={data}
       />

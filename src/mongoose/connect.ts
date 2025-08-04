@@ -1,3 +1,4 @@
+import { envServer } from "@/env/server.mjs";
 import mongoose from "mongoose";
 
 const MONGODB_URI = process.env.MONGODB_URI;
@@ -30,7 +31,10 @@ async function mongoConnect() {
 
   if (!cached.promise) {
     cached.promise = mongoose
-      .connect(MONGODB_URI, { dbName: "exams" })
+      .connect(MONGODB_URI, {
+        dbName:
+          envServer.NODE_ENV === "production" ? "exams" : "exams_development",
+      })
       .then((mongoose) => mongoose);
   }
 

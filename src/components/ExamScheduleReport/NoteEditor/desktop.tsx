@@ -42,7 +42,7 @@ export function Desktop({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
-        <Button size={"icon"} variant={"outline"}>
+        <Button size={"icon"} variant={"outline"} className="export-hidden">
           <Pencil2Icon />
         </Button>
       </DialogTrigger>
