@@ -84,8 +84,9 @@ export function ExamScheduleReport({ metadata, data, isRequestable }: Props) {
         ))}
       </div>
       <div className="md:flex xl:flex items-center justify-between md:space-y-0 xl:space-y-0 space-y-1">
-        <p className="font-medium text-destructive">
+        <p className="font-medium text-destructive text-wrap">
           คำเตือน : แนะนำให้ตรวจสอบตารางสอบด้วยตนเองอีกครั้งเพื่อความถูกต้อง!{" "}
+          เนื่องจากระบบนี้ไม่ใช่ของวิทยาเขต{" "}อาจมีข้อมูลคลาดเคลื่อน
         </p>
         <p
           className="text-xs font-medium end-credit"
