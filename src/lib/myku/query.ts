@@ -1,7 +1,10 @@
 import "server-only";
 import axios from "axios";
 import { headers } from "./utils";
-import { GetMyCourseResponseInterface } from "./types";
+import {
+  GetMyCourseResponseInterface,
+  GetOpenSubjectResponseInterface,
+} from "./types";
 
 export class MyKuQueryInstance {
   private token: string;
@@ -21,6 +24,13 @@ export class MyKuQueryInstance {
     if (!stdCode) throw new Error("stdCode is required!");
     return axios.get(
       `https://my.ku.th/myku/api/std-profile/stdimages?stdcode=${stdCode}`,
+      { headers: headers(this.token) }
+    );
+  }
+  getCourseMetadata(subjectCode: string) {
+    if (!subjectCode) throw new Error("subjectCode is required!");
+    return axios.get<GetOpenSubjectResponseInterface>(
+      `https://my.ku.th/myku/api/enroll/openSubjectForEnroll?query=${subjectCode}&academicYear=2568&semester=1&campusCode=K&section=`,
       { headers: headers(this.token) }
     );
   }
