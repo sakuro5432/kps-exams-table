@@ -72,21 +72,25 @@ export function ExamScheduleReport({ metadata, data, isRequestable }: Props) {
         </div>
       </div>
       <div className="space-y-3">
-        {data.map(({ label: dateTh, items }) => (
-          <div key={dateTh} className="print:break-inside-avoid">
-            <h2 className="text-lg font-semibold mb-2">{dateTh}</h2>
-            <div className="md:grid xl:grid grid-cols-2 gap-1 print:grid print:break-inside-avoid">
-              {items.map((x) => (
-                <ExamCard key={x.id} data={x} />
-              ))}
+        {data.length > 0 &&
+          data.map(({ label: dateTh, items }) => (
+            <div key={dateTh} className="print:break-inside-avoid">
+              <h2 className="text-lg font-semibold mb-2">{dateTh}</h2>
+              <div className="md:grid xl:grid grid-cols-2 gap-1 print:grid print:break-inside-avoid">
+                {items.map((x) => (
+                  <ExamCard key={x.id} data={x} />
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        {data.length === 0 && (
+          <p>ไม่สามารถดึงข้อมูลวิชาเรียนของท่านได้ / ไม่พบวิชาสอบ</p>
+        )}
       </div>
       <div className="md:flex xl:flex items-center justify-between md:space-y-0 xl:space-y-0 space-y-1">
         <p className="font-medium text-destructive text-wrap">
           คำเตือน : แนะนำให้ตรวจสอบตารางสอบด้วยตนเองอีกครั้งเพื่อความถูกต้อง!{" "}
-          เนื่องจากระบบนี้ไม่ใช่ของวิทยาเขต{" "}อาจมีข้อมูลคลาดเคลื่อน
+          เนื่องจากระบบนี้ไม่ใช่ของวิทยาเขต อาจมีข้อมูลคลาดเคลื่อน
         </p>
         <p
           className="text-xs font-medium end-credit"
