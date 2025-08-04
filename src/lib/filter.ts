@@ -60,16 +60,22 @@ export function filterExamScheduleByStudent(
 
   return todo
     .map((x): MatchedExamType | null => {
-      const course = data.find((course) => {
-        const registeredSubjectCode = course.subjectCode.replace(/–/g, "-");
+      const course = data.find((r) => {
+        const registeredSubjectCode = r.subjectCode.replace(/–/g, "-");
         const examSubjectCode = x.subjectCode.replace(/–/g, "-");
+
+        const matchedSectionCode = x.sectionCode
+          .split(",")
+          .map((s) => s.trim())
+          .includes(r.sectionCode);
+
+        const matchedSectionType =
+          x.sectionType == null || r.sectionType === x.sectionType;
 
         return (
           registeredSubjectCode.startsWith(examSubjectCode) &&
-          x.sectionCode
-            .split(",")
-            .map((s) => s.trim())
-            .includes(course.sectionCode)
+          matchedSectionCode &&
+          matchedSectionType
         );
       });
 
@@ -80,6 +86,7 @@ export function filterExamScheduleByStudent(
           ...x,
           subjectNameTh: course.subjectNameTh,
           sectionId: course.sectionId,
+          sectionType: course.sectionType,
         };
       }
 
@@ -92,6 +99,7 @@ export function filterExamScheduleByStudent(
           ...x,
           subjectNameTh: course.subjectNameTh,
           sectionId: course.sectionId,
+          sectionType: course.sectionType,
         };
       }
 
