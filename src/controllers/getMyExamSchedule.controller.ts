@@ -1,11 +1,9 @@
 import "server-only";
 import { prisma } from "../lib/db";
 import { groupByDate } from "../lib/filter";
-import UserExamModel from "@/mongoose/model/UserExamSchema";
-import mongoConnect from "@/lib/mongoose";
+import UserExamModel from "@/mongoose/model/UserExam";
 import { envServer } from "@/env/server.mjs";
 import { ExamScheduleType } from "@/types/schedule.types";
-
 
 export async function getMyExamSchedule(stdCode: string): Promise<{
   data: {
@@ -14,7 +12,6 @@ export async function getMyExamSchedule(stdCode: string): Promise<{
   }[];
   requestUpdateAt: Date | null;
 }> {
-  await mongoConnect();
   const user = await prisma.user.findUnique({
     where: { stdCode },
     select: { requestUpdateAt: true },
@@ -39,40 +36,43 @@ export async function getMyExamSchedule(stdCode: string): Promise<{
       { upsert: true, new: true }
     );
   }
+
   return {
     data: groupByDate(data),
     requestUpdateAt,
   };
 }
 
-async function getUserExamSchedule(stdCode: string): Promise<ExamScheduleType[]> {
-  return (
-    await prisma.userExamSchedule.findMany({
-      where: { stdCode },
-      include: {
-        UserExamNote: {
-          take: 1,
-        },
-        CourseSchedule: {
-          select: {
-            subjectCode: true,
-            subjectNameTh: true,
-            teacherName: true,
-          },
-        },
-        ExamSchedule: {
-          select: {
-            dateTh: true,
-            date: true,
-            time: true,
-            studentIdRange: true,
-            sectionCode: true,
-            room: true,
-          },
+async function getUserExamSchedule(
+  stdCode: string
+): Promise<ExamScheduleType[]> {
+  const data = await prisma.userExamSchedule.findMany({
+    where: { stdCode, deletedAt: null },
+    include: {
+      UserExamNote: {
+        take: 1,
+      },
+      CourseSchedule: {
+        select: {
+          sectionType: true,
+          subjectCode: true,
+          subjectNameTh: true,
+          teacherName: true,
         },
       },
-    })
-  )
+      ExamSchedule: {
+        select: {
+          dateTh: true,
+          date: true,
+          time: true,
+          studentIdRange: true,
+          sectionCode: true,
+          room: true,
+        },
+      },
+    },
+  });
+  return data
     .map(
       ({
         stdCode,
@@ -88,6 +88,7 @@ async function getUserExamSchedule(stdCode: string): Promise<ExamScheduleType[]>
           ...rest,
           ...CourseSchedule,
           ...ExamSchedule,
+          sectionType: CourseSchedule.sectionType,
           note: rest.UserExamNote.at(0)?.note || null,
         } as ExamScheduleType)
     )
