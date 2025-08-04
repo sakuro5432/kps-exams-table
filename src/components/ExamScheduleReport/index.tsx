@@ -5,7 +5,10 @@ import dynamic from "next/dynamic";
 import { DownloadScreenshotButton } from "../DownloadScreenshotButton";
 import { envClient } from "@/env/client";
 import { ExamCard } from "./exam-card";
+import { Button } from "../ui/button";
+import Link from "next/link";
 import { Skeleton } from "../ui/skeleton";
+import { FrameIcon } from "@radix-ui/react-icons";
 const RequestUpdateButton = dynamic(
   () => import("../RequestUpdateButton").then((x) => x.RequestUpdateButton),
   {
@@ -52,9 +55,21 @@ export function ExamScheduleReport({ metadata, data, isRequestable }: Props) {
           </div>
         </div>
       </div>
-      <div className="print:hidden export-hidden w-full grid grid-cols-2 xl:flex xl:justify-end gap-1">
-        <RequestUpdateButton isRequestable={isRequestable} />
-        <DownloadScreenshotButton contentRef={contentRef} />
+      <div className="print:hidden export-hidden w-full flex flex-col xl:flex-row xl:justify-end gap-2">
+        <div className="flex w-full gap-2 xl:w-auto">
+          <div className="w-1/2 xl:w-auto">
+            <RequestUpdateButton isRequestable={isRequestable} />
+          </div>
+          <Link href="/exams/planner" className="w-1/2 xl:w-auto">
+            <Button variant="outline" className="w-full">
+              <FrameIcon className="mr-2" />
+              จัดตารางสอบ
+            </Button>
+          </Link>
+        </div>
+        <div className="w-full xl:w-fit">
+          <DownloadScreenshotButton contentRef={contentRef} />
+        </div>
       </div>
       <div className="space-y-3">
         {data.map(({ label: dateTh, items }) => (
