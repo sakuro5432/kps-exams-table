@@ -8,6 +8,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserRole {
+  ADMIN
+  STUDENT
+}
+
 model User {
   stdCode           String             @id @db.VarChar(12)
   loginName         String             @db.VarChar(12)
@@ -36,6 +41,7 @@ model User {
   UserExamSchedule  UserExamSchedule[]
   RegisteredCourse  RegisteredCourse[]
   RequestUpdate     RequestUpdate[]
+  role              UserRole           @default(STUDENT)
   Advisor           Advisor            @relation(fields: [advisorId], references: [advisorId])
   Major             Major              @relation(fields: [majorCode], references: [majorCode])
   Department        Department         @relation(fields: [departmentCode], references: [departmentCode])
@@ -44,6 +50,7 @@ model User {
   // Copen             Copen?             @relation(fields: [copenId], references: [copenId])
   UserReview        UserReview[]
   UserExamNote      UserExamNote[]
+  ExamSchedule      ExamSchedule[]
 }
 
 // model Copen {
@@ -90,6 +97,12 @@ enum ExamScheduleStatus {
   REJECTED
 }
 
+enum ReportBy {
+  SYSTEM
+  ADMIN
+  STUDENT
+}
+
 model ExamSchedule {
   id             String    @id @default(cuid())
   dateTh         String    @db.VarChar(50)
@@ -101,10 +114,14 @@ model ExamSchedule {
   studentIdRange String?   @db.VarChar(50)
   createdAt      DateTime  @default(now())
   deletedAt      DateTime?
+  sectionType    String?   @db.Char(6)
 
   isCorrectCount Int                @default(0) // จำนวนโหวตถูกต้อง
   status         ExamScheduleStatus @default(APPROVED) // pending, approved, rejected
 
+  stdCode          String?            @db.VarChar(12)
+  reportBy         ReportBy           @default(STUDENT)
+  User             User?              @relation(fields: [stdCode], references: [stdCode])
   reviews          UserReview[]
   UserExamSchedule UserExamSchedule[]
 }
@@ -140,18 +157,18 @@ model RegisteredCourse {
 }
 
 model CourseSchedule {
-  sectionId     Int      @id
-  subjectCode   String   @db.VarChar(50)
-  subjectNameTh String   @db.VarChar(100)
-  sectionCode   String   @db.VarChar(10)
-  sectionType   String   @db.VarChar(6)
-  sectionTypeTh String   @db.VarChar(50)
-  stdStatusTh   String   @db.VarChar(50)
-  teacherName   String?  @db.VarChar(100)
-  timeFrom      String   @db.VarChar(5) // e.g., "15:00"
-  timeTo        String   @db.VarChar(5) // e.g., "17:00"
-  dayW          String   @db.VarChar(10) // e.g., "MON"
-  roomNameTh    String   @db.VarChar(50)
+  sectionId     Int     @id
+  subjectCode   String  @db.VarChar(50)
+  subjectNameTh String  @db.VarChar(100)
+  sectionCode   String  @db.VarChar(10)
+  sectionType   String  @db.VarChar(6)
+  sectionTypeTh String  @db.VarChar(50)
+  stdStatusTh   String  @db.VarChar(50)
+  teacherName   String? @db.VarChar(100)
+  timeFrom      String  @db.VarChar(5) // e.g., "15:00"
+  timeTo        String  @db.VarChar(5) // e.g., "17:00"
+  dayW          String  @db.VarChar(10) // e.g., "MON"
+  roomNameTh    String  @db.VarChar(50)
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -165,14 +182,13 @@ model CourseSchedule {
 }
 
 model UserExamSchedule {
-  id             String    @id @default(cuid())
-  stdCode        String    @db.VarChar(12)
-  examScheduleId String    @db.VarChar(50)
+  id             String         @id @default(cuid())
+  stdCode        String         @db.VarChar(12)
+  examScheduleId String         @db.VarChar(50)
   sectionId      Int
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
   deletedAt      DateTime?
-
   User           User           @relation(fields: [stdCode], references: [stdCode])
   ExamSchedule   ExamSchedule   @relation(fields: [examScheduleId], references: [id])
   CourseSchedule CourseSchedule @relation(fields: [sectionId], references: [sectionId])
