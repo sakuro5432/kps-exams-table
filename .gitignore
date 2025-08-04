@@ -46,4 +46,7 @@ next-env.d.ts
 
 /src/env/server.js
 
+# DO NOT UPLOAD
 /src/app/admin
+/src/app/exams/planner/SearchBox/
+/src/components/ExamScheduleReport/DeleteButton/
