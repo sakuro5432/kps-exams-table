@@ -24,7 +24,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={cn("antialiased", font.className)}>
         <Providers>
-          <main className="min-h-screen xl:px-96 py-4 px-4 w-full">
+          <main className="min-h-screen xl:px-96 py-4 px-4 w-full space-y-5">
             <Navbar />
             {children}
           </main>
