@@ -45,3 +45,5 @@ next-env.d.ts
 /src/lib/generated/prisma
 
 /src/env/server.js
+
+/src/app/admin
