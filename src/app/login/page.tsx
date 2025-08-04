@@ -4,7 +4,7 @@ import { Auth } from "@/lib/auth";
 
 export default async function Page() {
   const isAuth = await Auth();
-  if (isAuth && !isAuth.user.forceLogout) redirect("/exams");
+  if (isAuth && !isAuth.session.forceLogout) redirect("/exams");
   return (
     <div className="space-y-4">
       <div className="text-center">
