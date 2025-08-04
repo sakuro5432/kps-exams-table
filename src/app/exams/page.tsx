@@ -31,7 +31,7 @@ export default async function Page() {
       <div>
         <Link
           href={
-            "https://ead.kps.ku.ac.th/2025/index.php/nisit-m/exam-menu/5-first-exam?download=60:prakas-mk-kphs-reuxng-tarang-sxb-klang-phakh-praca-phakh-tn-pi-kar-suksa-2568-lng-wan-thi-17-krkdakhm-2568"
+            "https://ead.kps.ku.ac.th/2025/index.php/nisit-m/exam-menu/5-first-exam"
           }
           target="_blank"
           className="underline"
