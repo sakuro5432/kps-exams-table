@@ -38,3 +38,12 @@ export function checkRequestCooldown(lastRequestAt: Date | null): {
     };
   }
 }
+export function isPast(date: Date) {
+  const examDate = new Date(date); // clone ป้องกัน mutation
+  examDate.setHours(0, 0, 0, 0);
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  return examDate < today; // ใช้ <= ถ้าวันนี้ก็ถือเป็น past
+}

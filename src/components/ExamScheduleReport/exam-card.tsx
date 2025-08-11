@@ -3,6 +3,7 @@ import { Badge } from "../ui/badge";
 import NoteEditor from "./NoteEditor";
 import { BadgeSectionCode } from "../BadgeSectionCode";
 import { sectionTypeTranslator } from "@/utils/section";
+import { cn, isPast } from "@/lib/utils";
 // import DeleteButton from "./DeleteButton";
 
 interface Props {
@@ -10,7 +11,12 @@ interface Props {
 }
 export function ExamCard({ data }: Props) {
   return (
-    <div className="space-y-2.5 border rounded p-4 bg-muted mb-2 relative w-full xl:min-w-lg">
+    <div
+      className={cn(
+        "space-y-2.5 border rounded p-4 bg-muted mb-2 relative w-full xl:min-w-lg",
+        isPast(data.date) && "opacity-60"
+      )}
+    >
       {data.isTimeDuplicate && (
         <Badge variant={"destructive"} className="absolute -top-3 ">
           พบเวลาสอบอาจทับซ้อนกัน

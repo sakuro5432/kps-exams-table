@@ -9,6 +9,7 @@ import { Button } from "../ui/button";
 import Link from "next/link";
 import { Skeleton } from "../ui/skeleton";
 import { FrameIcon } from "@radix-ui/react-icons";
+import { cn, isPast } from "@/lib/utils";
 const RequestUpdateButton = dynamic(
   () => import("../RequestUpdateButton").then((x) => x.RequestUpdateButton),
   {
@@ -27,6 +28,7 @@ interface Props {
   };
   data: {
     label: string;
+    date: Date;
     items: ExamScheduleType[];
   }[];
   isRequestable: { disabled: boolean; message: string };
@@ -73,9 +75,16 @@ export function ExamScheduleReport({ metadata, data, isRequestable }: Props) {
       </div>
       <div className="space-y-3">
         {data.length > 0 &&
-          data.map(({ label: dateTh, items }) => (
+          data.map(({ label: dateTh, date, items }) => (
             <div key={dateTh} className="print:break-inside-avoid">
-              <h2 className="text-lg font-semibold mb-2">{dateTh}</h2>
+              <h2
+                className={cn(
+                  "text-lg font-semibold mb-2",
+                  isPast(date) && "line-through"
+                )}
+              >
+                {dateTh}
+              </h2>
               <div className="md:grid xl:grid grid-cols-2 gap-1 print:grid print:break-inside-avoid">
                 {items.map((x) => (
                   <ExamCard key={x.id} data={x} />

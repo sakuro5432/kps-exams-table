@@ -1,9 +1,15 @@
 import { RegisteredCourseType, MatchedExamType } from "@/types/schedule.types";
 import { ExamSchedule } from "@/lib/generated/prisma";
 
-export function groupByDate<T extends { dateTh: string; time: string }>(
+import { isBefore, startOfDay, compareAsc } from "date-fns";
+
+export function groupByDate<T extends { dateTh: string; time: string; date: Date }>(
   items: T[]
-): { label: string; items: (T & { isTimeDuplicate?: boolean })[] }[] {
+): {
+  label: string;
+  date: Date;
+  items: (T & { isTimeDuplicate?: boolean })[];
+}[] {
   const grouped = items.reduce((acc, item) => {
     if (!acc[item.dateTh]) {
       acc[item.dateTh] = [];
@@ -42,12 +48,23 @@ export function groupByDate<T extends { dateTh: string; time: string }>(
     }
   }
 
-  // แปลงจาก object -> array of { dateTh, items }
-  return Object.entries(grouped).map(([dateTh, items]) => ({
-    label: dateTh,
-    items,
-  }));
+  return Object.entries(grouped)
+    .map(([dateTh, items]) => ({
+      label: dateTh,
+      date: items[0].date,
+      items,
+    }))
+    .sort((a, b) => {
+      const today = startOfDay(new Date());
+      const aPast = isBefore(startOfDay(a.date), today);
+      const bPast = isBefore(startOfDay(b.date), today);
+
+      if (aPast && !bPast) return 1; // a เป็นอดีต → ลงล่าง
+      if (!aPast && bPast) return -1; // b เป็นอดีต → ลงล่าง
+      return compareAsc(a.date, b.date); // เรียงวันจากน้อยไปมากในกลุ่มเดียวกัน
+    });
 }
+
 
 export function filterExamScheduleByStudent(
   todo: ExamSchedule[],

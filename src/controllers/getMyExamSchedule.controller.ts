@@ -8,6 +8,7 @@ import { ExamScheduleType } from "@/types/schedule.types";
 export async function getMyExamSchedule(stdCode: string): Promise<{
   data: {
     label: string;
+    date: Date;
     items: ExamScheduleType[];
   }[];
   requestUpdateAt: Date | null;
