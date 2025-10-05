@@ -1,10 +1,11 @@
+"use server";
 import { z } from "zod";
-import pkg from '@next/env'
- 
-const projectDir = process.cwd()
-pkg.loadEnvConfig(projectDir)
+import pkg from "@next/env";
 
-export const envSchema = z.object({
+const projectDir = process.cwd();
+pkg.loadEnvConfig(projectDir);
+
+const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"], {
     message:
       "NODE_ENV is required and must be one of 'development', 'test', or 'production'",
@@ -32,7 +33,7 @@ export const envServer = {
   NEXT_PUBLIC_URL: process.env.NEXT_PUBLIC_BASEURL,
 };
 
-export async function testEnv() {
+async function testEnv() {
   try {
     const env = envSchema.safeParse(envServer);
     if (!env.success) throw new Error(env.error.issues[0].message);
