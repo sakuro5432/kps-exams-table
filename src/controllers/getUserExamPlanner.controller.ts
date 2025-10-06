@@ -2,6 +2,7 @@ import "server-only";
 import { prisma } from "@/lib/db";
 import { UserPlannerData } from "@/types/userExamPlanner.types";
 import UserExamPlannerModel from "@/mongoose/model/UserExamPlanner";
+import { $Enums } from "@/lib/generated/prisma";
 
 interface Props {
   stdCode: string;
@@ -37,11 +38,13 @@ async function getPlannerData({ stdCode }: Props): Promise<UserPlannerData[]> {
     where: {
       stdCode,
       deletedAt: null,
-      ExamSchedule: { NOT: { reportBy: "SYSTEM" } },
+      ExamSchedule: {
+        reportBy: { notIn: ["ADMIN", "SEED"] },
+      },
     },
     include: {
       ExamSchedule: {
-        select: { date: true, dateTh: true, room: true, time: true },
+        select: { date: true, room: true, time: true },
       },
     },
   });
@@ -52,7 +55,6 @@ async function getPlannerData({ stdCode }: Props): Promise<UserPlannerData[]> {
     if (s) {
       schedule = {
         date: s.ExamSchedule.date,
-        dateTh: s.ExamSchedule.dateTh,
         room: s.ExamSchedule.room,
         time: s.ExamSchedule.time,
       };
@@ -73,7 +75,12 @@ async function getPlannerData({ stdCode }: Props): Promise<UserPlannerData[]> {
 }
 export async function getUserExamPlanner(stdCode: string) {
   const cached = await UserExamPlannerModel.findOne({ stdCode }).lean();
-  if (cached) return cached.exams;
+  if (cached) {
+    return cached.exams.map((x) => ({
+      ...x,
+      sectionType: x.sectionType as $Enums.SectionType,
+    }));
+  }
   // fallback ไป query จาก SQL + สร้าง cache
   const exams = await getPlannerData({ stdCode });
   await UserExamPlannerModel.create({ stdCode, exams });
