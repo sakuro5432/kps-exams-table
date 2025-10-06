@@ -109,16 +109,16 @@ enum SectionType {
 }
 
 model ExamSchedule {
-  id             String       @id @default(cuid())
+  id             String      @id @default(cuid())
   date           DateTime
-  time           String       @db.VarChar(50)
-  subjectCode    String       @db.VarChar(50)
-  sectionCode    String       @db.VarChar(50)
-  room           String       @db.VarChar(50)
-  studentIdRange String?      @db.VarChar(50)
-  createdAt      DateTime     @default(now())
+  time           String      @db.VarChar(50)
+  subjectCode    String      @db.VarChar(50)
+  sectionCode    String      @db.VarChar(50)
+  room           String      @db.VarChar(50)
+  studentIdRange String?     @db.VarChar(50)
+  createdAt      DateTime    @default(now())
   deletedAt      DateTime?
-  sectionType    SectionType? @default(LECT)
+  sectionType    SectionType @default(LECT)
 
   isCorrectCount Int                @default(0) // จำนวนโหวตถูกต้อง
   status         ExamScheduleStatus @default(APPROVED) // pending, approved, rejected
