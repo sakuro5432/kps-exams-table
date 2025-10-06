@@ -98,7 +98,7 @@ enum ExamScheduleStatus {
 }
 
 enum ReportBy {
-  SYSTEM
+  SEED
   ADMIN
   STUDENT
 }
