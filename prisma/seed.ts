@@ -57,7 +57,7 @@ async function seed() {
         sectionCode: Group,
         room: Room,
         studentIdRange: StudentIDRange || null,
-        reportBy: "SYSTEM",
+        reportBy: "SEED",
       } as ExamSchedule;
     })
     .filter((r): r is NonNullable<typeof r> => r !== null);
