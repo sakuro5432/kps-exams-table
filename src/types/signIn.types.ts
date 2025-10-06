@@ -6,8 +6,8 @@ interface User {
   titleEn: string;
   firstNameTh: string;
   firstNameEn: string;
-  middleNameTh: any;
-  middleNameEn: any;
+  middleNameTh: string | null;
+  middleNameEn: string | null;
   lastNameTh: string;
   lastNameEn: string;
   avatar: string;
