@@ -40,7 +40,7 @@ export const authOptions: NextAuthOptions = {
             username: credentials!.username,
             password: credentials!.password,
           });
-          if (res === null) {
+          if (!res) {
             throw new Error("โปรดกรอกรหัสนิสิต/รหัสผ่าน");
           }
           if (res.data.user.student.campusCode !== "K") {
