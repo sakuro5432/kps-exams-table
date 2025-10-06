@@ -145,7 +145,7 @@ export const authOptions: NextAuthOptions = {
           const user: UserDataRequired = {
             id: res.data.user.idCode,
             name: completeName,
-            studentInfo: student,
+            studentInfo: basicInfo,
             accesstoken: res.data.accesstoken,
             role: findUser?.role || "STUDENT",
           };
