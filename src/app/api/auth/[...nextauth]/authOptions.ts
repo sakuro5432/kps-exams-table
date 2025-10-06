@@ -46,6 +46,9 @@ export const authOptions: NextAuthOptions = {
           if (res.data.user.student.campusCode !== "K") {
             throw new Error("เฉพาะนิสิตวิทยาเขตกำแพงแสน");
           }
+          if (res.data.user.userType !== "1") {
+            throw new Error("เฉพาะนิสิตเท่านั้น (กลัวระบบพังจัฟ 😢)");
+          }
 
           const { student } = res.data.user;
           const completeName = [
