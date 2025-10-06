@@ -37,8 +37,8 @@ export const authOptions: NextAuthOptions = {
             throw new Error(valid.error.issues[0].message);
           }
           const res = await app.login({
-            username: credentials!.username,
-            password: credentials!.password,
+            username: valid.data.username,
+            password: valid.data.password,
           });
           if (!res) {
             throw new Error("โปรดกรอกรหัสนิสิต/รหัสผ่าน");
