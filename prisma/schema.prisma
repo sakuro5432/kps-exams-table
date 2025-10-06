@@ -162,18 +162,17 @@ model RegisteredCourse {
 }
 
 model CourseSchedule {
-  sectionId     Int     @id
-  subjectCode   String  @db.VarChar(50)
-  subjectNameTh String  @db.VarChar(100)
-  sectionCode   String  @db.VarChar(10)
-  sectionType   String  @db.VarChar(6)
-  sectionTypeTh String  @db.VarChar(50)
-  stdStatusTh   String  @db.VarChar(50)
-  teacherName   String? @db.VarChar(100)
-  timeFrom      String  @db.VarChar(5) // e.g., "15:00"
-  timeTo        String  @db.VarChar(5) // e.g., "17:00"
-  dayW          String  @db.VarChar(10) // e.g., "MON"
-  roomNameTh    String  @db.VarChar(50)
+  sectionId     Int         @id
+  subjectCode   String      @db.VarChar(50)
+  subjectNameTh String      @db.VarChar(100)
+  sectionCode   String      @db.VarChar(10)
+  sectionType   SectionType @default(LECT)
+  stdStatusTh   String      @db.VarChar(50)
+  teacherName   String?     @db.VarChar(100)
+  timeFrom      String      @db.VarChar(5) // e.g., "15:00"
+  timeTo        String      @db.VarChar(5) // e.g., "17:00"
+  dayW          String      @db.VarChar(10) // e.g., "MON"
+  roomNameTh    String      @db.VarChar(50)
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
