@@ -118,7 +118,7 @@ model ExamSchedule {
   studentIdRange String?     @db.VarChar(50)
   createdAt      DateTime    @default(now())
   deletedAt      DateTime?
-  sectionType    SectionType @default(THEORY)
+  sectionType    SectionType @default(LECT)
 
   isCorrectCount Int                @default(0) // จำนวนโหวตถูกต้อง
   status         ExamScheduleStatus @default(APPROVED) // pending, approved, rejected
