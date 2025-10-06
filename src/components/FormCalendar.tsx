@@ -83,8 +83,15 @@ export default function FormCalendar<T, K extends keyof T>({
                 initialFocus
                 disableNavigation={disabledNavigation}
                 disabled={(date) => {
-                  // Disable ถ้าเดือนไม่ใช่สิงหาคม (month = 7 เพราะเริ่มนับจาก 0)
-                  return date.getMonth() !== 7 || date.getFullYear() !== 2025;
+                  {
+                    /*
+                    (month - 1 เพราะเริ่มนับจาก 0)
+                    */
+                  }
+
+                  return (
+                    date.getMonth() !== month - 1 || date.getFullYear() !== 2025
+                  );
                 }}
               />
             </PopoverContent>
