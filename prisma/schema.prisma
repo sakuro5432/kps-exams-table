@@ -120,8 +120,9 @@ model ExamSchedule {
   deletedAt      DateTime?
   sectionType    SectionType @default(LECT)
 
-  isCorrectCount Int                @default(0) // จำนวนโหวตถูกต้อง
-  status         ExamScheduleStatus @default(APPROVED) // pending, approved, rejected
+  isCorrectCount   Int                @default(0) // จำนวนโหวตถูกต้อง
+  isIncorrectCount Int                @default(0) // จำนวนโหวตที่ผิด
+  status           ExamScheduleStatus @default(APPROVED) // pending, approved, rejected
 
   stdCode          String?            @db.VarChar(12)
   reportBy         ReportBy           @default(STUDENT)
