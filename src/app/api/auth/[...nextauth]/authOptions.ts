@@ -189,7 +189,6 @@ export const authOptions: NextAuthOptions = {
       session.user.id = token.id;
       session.user.studentInfo = token.studentInfo;
       session.user.accesstoken = token.accesstoken;
-      session.user.accesstoken = token.accesstoken;
       return session;
     },
   },
