@@ -147,7 +147,7 @@ export function FormTimeRangeInput({
               "w-9 text-center p-0 border focus:outline-none focus:ring-0 disabled:opacity-50",
               hasError && "border border-destructive"
             )}
-            disabled={disabled}
+            disabled={true}
           />
           <Button
             type="button"
@@ -185,7 +185,7 @@ export function FormTimeRangeInput({
               "w-9 text-center p-0 border focus:outline-none focus:ring-0 disabled:opacity-50"
               //   hasError && "border border-destructive"
             )}
-            disabled={disabled}
+            disabled={true}
           />
           <Button
             type="button"
