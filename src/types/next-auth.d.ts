@@ -26,7 +26,7 @@ declare module "next-auth" {
     email?: string;
     image?: string;
     forceLogout?: boolean;
-    studentInfo: LoginProfile["student"];
+    studentInfo: Omit<LoginProfile["student"],"firstNameEn", "lastNameEn">;
     accesstoken: string;
     role: $Enums.UserRole;
   }
