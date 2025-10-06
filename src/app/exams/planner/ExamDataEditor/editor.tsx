@@ -110,7 +110,8 @@ export function FormEditor({ data, setSelected }: Props) {
           <CardHeader>
             <CardTitle>วิชา: {data.subjectNameTh}</CardTitle>
             <CardDescription className="font-medium">
-              {data.subjectCode} / {sectionTypeTranslator(data.sectionType)}
+              {data.subjectCode} /{" "}
+              {sectionTypeTranslator(data.sectionType, true)}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -135,7 +136,7 @@ export function FormEditor({ data, setSelected }: Props) {
                 schema={schema}
                 name={"date"}
                 label="เลือกวันสอบ"
-                month={8}
+                targetMonth={10}
                 disabledNavigation
               />
               <FormTimeRangeInput
