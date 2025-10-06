@@ -18,7 +18,10 @@ export async function getMyCourse(
       include: { CourseSchedule: true },
     });
     if (registeredCourse.length > 0)
-      return registeredCourse.map((x) => ({ ...x.CourseSchedule, stdCode }));
+      return registeredCourse.map(({ ...rest }) => ({
+        ...rest.CourseSchedule,
+        stdCode,
+      }));
     const res = await app
       .query(token)
       .getMyCourse(decodeAccessToken(token).stdid);
@@ -35,19 +38,16 @@ export async function getMyCourse(
       subjectCode: course.subject_code,
       subjectNameTh: course.subject_name_th,
       sectionCode: course.section_code,
-      sectionTypeTh: course.section_type_th,
       stdStatusTh: course.std_status_th,
       teacherName: course.teacher_name || null, // Handle optional field
       timeFrom: course.time_from,
       timeTo: course.time_to,
       dayW: course.day_w,
       roomNameTh: course.room_name_th,
-      sectionType: course.section_type,
+      sectionType: course.section_type === "16902" ? "LAB" : "LECT",
       stdCode,
     }));
   } catch (error) {
     return null;
   }
 }
-
-
