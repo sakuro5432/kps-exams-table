@@ -104,8 +104,8 @@ enum ReportBy {
 }
 
 enum SectionType {
-  THEORY
-  PRACTICAL
+  LECT
+  LAB
 }
 
 model ExamSchedule {
