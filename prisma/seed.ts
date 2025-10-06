@@ -29,35 +29,17 @@ async function seed() {
 
       const date = new Date(DateStr);
 
-      // 🗓️ Generate Thai date string (e.g. "20 ตุลาคม 2568")
-      const thaiMonths = [
-        "มกราคม",
-        "กุมภาพันธ์",
-        "มีนาคม",
-        "เมษายน",
-        "พฤษภาคม",
-        "มิถุนายน",
-        "กรกฎาคม",
-        "สิงหาคม",
-        "กันยายน",
-        "ตุลาคม",
-        "พฤศจิกายน",
-        "ธันวาคม",
-      ];
-      const day = date.getDate();
-      const month = thaiMonths[date.getMonth()];
-      const year = date.getFullYear() + 543;
-      const dateTh = `${day} ${month} ${year}`;
-
       return {
         date,
-        dateTh,
         time: Time,
-        subjectCode: SubjectCode,
+        subjectCode: SubjectCode.replace(/\s*\(.*\)$/, ""),
         sectionCode: Group,
         room: Room,
         studentIdRange: StudentIDRange || null,
         reportBy: "SEED",
+        sectionType: SubjectCode.split(" ")[1]?.includes("LAB")
+          ? "LAB"
+          : "LECT",
       } as ExamSchedule;
     })
     .filter((r): r is NonNullable<typeof r> => r !== null);
