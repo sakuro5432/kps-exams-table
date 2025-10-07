@@ -111,7 +111,8 @@ enum SectionType {
 model ExamSchedule {
   id             String      @id @default(cuid())
   date           DateTime
-  time           String      @db.VarChar(50)
+  timeFrom       Int         @db.UnsignedInt
+  timeTo         Int         @db.UnsignedInt
   subjectCode    String      @db.VarChar(50)
   sectionCode    String      @db.VarChar(50)
   room           String      @db.VarChar(50)
@@ -168,8 +169,8 @@ model CourseSchedule {
   sectionCode   String      @db.VarChar(10)
   sectionType   SectionType @default(LECT)
   teacherName   String?     @db.VarChar(100)
-  timeFrom      String      @db.VarChar(5) // e.g., "15:00"
-  timeTo        String      @db.VarChar(5) // e.g., "17:00"
+  timeFrom      Int         @db.UnsignedInt // e.g., "13.00" = 13 Hour * 60 Minutes = 780 Minutes
+  timeTo        Int         @db.UnsignedInt // e.g., "16.30" = 16.30 Hour * 60 Minutes = 978 Minutes
   dayW          String      @db.VarChar(10) // e.g., "MON"
   roomNameTh    String      @db.VarChar(50)
 
