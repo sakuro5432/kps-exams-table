@@ -167,7 +167,6 @@ model CourseSchedule {
   subjectNameTh String      @db.VarChar(100)
   sectionCode   String      @db.VarChar(10)
   sectionType   SectionType @default(LECT)
-  stdStatusTh   String      @db.VarChar(50)
   teacherName   String?     @db.VarChar(100)
   timeFrom      String      @db.VarChar(5) // e.g., "15:00"
   timeTo        String      @db.VarChar(5) // e.g., "17:00"
