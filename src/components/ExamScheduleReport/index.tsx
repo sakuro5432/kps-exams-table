@@ -94,15 +94,12 @@ export function ExamScheduleReport({ metadata, data }: Props) {
                 </div>
               ))}
             </div>
-          ))}
-        {data.length === 0 && (
-          <p>ไม่สามารถดึงข้อมูลวิชาเรียนของท่านได้ / ไม่พบวิชาสอบ</p>
-        )}
+          </div>
+        ))}
       </div>
       <div className="md:flex xl:flex items-center justify-between md:space-y-0 xl:space-y-0 space-y-1">
-        <p className="font-medium text-destructive text-wrap">
+        <p className="font-medium text-destructive">
           คำเตือน : แนะนำให้ตรวจสอบตารางสอบด้วยตนเองอีกครั้งเพื่อความถูกต้อง!{" "}
-          เนื่องจากระบบนี้ไม่ใช่ของวิทยาเขต อาจมีข้อมูลคลาดเคลื่อน
         </p>
         <p
           className="text-xs font-medium end-credit"

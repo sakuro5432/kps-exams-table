@@ -1,9 +1,5 @@
-"use server";
 import { z } from "zod";
 import pkg from "@next/env";
-
-const projectDir = process.cwd();
-pkg.loadEnvConfig(projectDir);
 
 const projectDir = process.cwd();
 pkg.loadEnvConfig(projectDir);

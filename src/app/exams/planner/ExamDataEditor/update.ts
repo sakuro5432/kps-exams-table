@@ -16,8 +16,7 @@ type ResponseCode =
   | "NOT_FOUND"
   | "INVALID_FORMAT"
   | "SUCCESS"
-  | "EXISTS"
-  | "INTERNAL_SERVER_ERROR";
+  | "EXISTS";
 interface ResponseData {
   message: string;
   code: ResponseCode;
@@ -72,11 +71,10 @@ export async function update(payload: string): Promise<ResponseData> {
           timeTo,
         },
       });
-      if (!isRegistered || !isRegistered.CourseSchedule) {
-        return { message: "ไม่พบข้อมูลรายวิชานี้", code: "NOT_FOUND" };
-      }
-      const isExistExam = await tx.examSchedule.findFirst({
-        where: {
+      updated = { type: "UPDATE_EXAM", data: r };
+    } else {
+      const insertExamSchedule = await tx.examSchedule.create({
+        data: {
           stdCode,
           subjectCode,
           sectionCode,
@@ -88,47 +86,17 @@ export async function update(payload: string): Promise<ResponseData> {
           sectionType: isRegistered.CourseSchedule.sectionType,
         },
       });
-      const formattedTime = `${timeFrom.replace(":", ".")}-${timeTo.replace(
-        ":",
-        "."
-      )}`;
-      const dateTh = getThaiDate(date);
-      let updated: {
-        type: keyof typeof LogAction;
-        data: ExamSchedule;
-      } | null = null;
-      if (isExistExam) {
-        const r = await tx.examSchedule.update({
-          where: {
-            id: isExistExam.id,
-          },
-          data: { room, date, dateTh, time: formattedTime },
-        });
-        updated = { type: "UPDATE_EXAM", data: r };
-      } else {
-        const insertExamSchedule = await tx.examSchedule.create({
-          data: {
-            stdCode,
-            subjectCode,
-            sectionCode,
-            room,
-            date,
-            dateTh,
-            time: formattedTime,
-            reportBy: "STUDENT",
-          },
-        });
 
-        await tx.userExamSchedule.create({
-          data: {
-            stdCode,
-            examScheduleId: insertExamSchedule.id,
-            sectionId: isRegistered.sectionId,
-          },
-        });
+      await tx.userExamSchedule.create({
+        data: {
+          stdCode,
+          examScheduleId: insertExamSchedule.id,
+          sectionId: isRegistered.sectionId,
+        },
+      });
 
-        updated = { type: "CREATE_EXAM", data: insertExamSchedule };
-      }
+      updated = { type: "CREATE_EXAM", data: insertExamSchedule };
+    }
 
     if (envServer.NODE_ENV === "production") {
       // Update MongoDB cache
@@ -160,12 +128,8 @@ export async function update(payload: string): Promise<ResponseData> {
       });
     }
 
-      revalidatePath("/exams/planner");
-      revalidatePath("/exams");
-      return { message: "แก้ไขสำเร็จ", code: "SUCCESS" };
-    });
-  } catch (error) {
-    console.error("Update exam schedule error:", error);
-    return { message: "เกิดข้อผิดพลาด", code: "INTERNAL_SERVER_ERROR" };
-  }
+    revalidatePath("/exams/planner");
+    revalidatePath("/exams");
+    return { message: "แก้ไขสำเร็จ", code: "SUCCESS" };
+  });
 }
