@@ -170,7 +170,7 @@ export function FormTimeRangeInput({
             variant="ghost"
             className="h-5 w-5"
             onClick={() =>
-              updateFn({ ...time, minutes: (time.minutes + 1) % 60 })
+              updateFn({ ...time, minutes: (time.minutes + 10) % 60 })
             }
             disabled={disabled}
           >
@@ -193,7 +193,7 @@ export function FormTimeRangeInput({
             variant="ghost"
             className="h-5 w-5"
             onClick={() =>
-              updateFn({ ...time, minutes: (time.minutes - 1 + 60) % 60 })
+              updateFn({ ...time, minutes: (time.minutes - 10 + 60) % 60 })
             }
             disabled={disabled}
           >
@@ -206,8 +206,8 @@ export function FormTimeRangeInput({
   return (
     <div className={cn("flex flex-col space-y-2", className)}>
       <div className="flex space-x-10 items-center">
-        {buildTimeInput("เริ่มเวลา", startTime, updateStart)}
         {buildTimeInput("สิ้นสุดเวลา", endTime, updateEnd)}
+        {buildTimeInput("เริ่มเวลา", startTime, updateStart)}
       </div>
       {hasError && (
         <p className="text-sm text-red-500 mt-1">
