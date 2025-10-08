@@ -1,26 +1,29 @@
 import { z } from "zod";
-import pkg from '@next/env'
- 
-const projectDir = process.cwd()
-pkg.loadEnvConfig(projectDir)
+import pkg from "@next/env";
+
+const projectDir = process.cwd();
+pkg.loadEnvConfig(projectDir);
 
 export const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"], {
     message:
       "NODE_ENV is required and must be one of 'development', 'test', or 'production'",
   }),
-  MYKU_PUBLIC_KEY: z.string().min(1, "MYKU_PUBLIC_KEY is required"),
+  MYKU_PUBLIC_KEY: z.string().min(1, "MYKU_PUBLIC_KEY is required").trim(),
   DATABASE_URL: z
     .string()
     .regex(
       /^mysql:\/\/[^:]+:[^@]+@[^:/]+:\d{2,5}\/[a-zA-Z0-9_]+$/,
       "DATABASE_URL must be in the format mysql://user:pass@host:port/db"
-    ),
+    )
+    .trim(),
   NEXTAUTH_SECRET: z
     .string()
-    .min(8, "NEXTAUTH_SECRET must be at least 8 characters long"),
-  NEXTAUTH_URL: z.url("NEXTAUTH_URL must be a valid URL"),
-  NEXT_PUBLIC_URL: z.url("NEXT_PUBLIC_URL must be a valid URL"),
+    .min(8, "NEXTAUTH_SECRET must be at least 8 characters long")
+    .trim(),
+  NEXTAUTH_URL: z.url("NEXTAUTH_URL must be a valid URL").trim(),
+  NEXT_PUBLIC_BASEURL: z.url("NEXT_PUBLIC_BASEURL must be a valid URL").trim(),
+  REDIS_URI: z.url("REDIS_URI must be a valid URL").trim(),
 });
 
 export const envServer = {
@@ -29,10 +32,11 @@ export const envServer = {
   DATABASE_URL: process.env.DATABASE_URL,
   NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
   NEXTAUTH_URL: process.env.NEXTAUTH_URL,
-  NEXT_PUBLIC_URL: process.env.NEXT_PUBLIC_BASEURL,
+  NEXT_PUBLIC_BASEURL: process.env.NEXT_PUBLIC_BASEURL,
+  REDIS_URI: process.env.REDIS_URI,
 };
 
-export async function testEnv() {
+async function testEnv() {
   try {
     const env = envSchema.safeParse(envServer);
     if (!env.success) throw new Error(env.error.issues[0].message);

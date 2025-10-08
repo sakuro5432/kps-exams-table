@@ -1,14 +1,38 @@
 import { prisma } from "@/lib/db";
 import { ExamSchedule } from "@/lib/generated/prisma";
+import { timeRangeToMinutes } from "@/utils/date";
 import fs from "fs";
 import path from "path";
+import mongoose from "mongoose";
+import UserExamModel from "../src/mongoose/model/UserExam";
+import UserExamPlannerModel from "../src/mongoose/model/UserExamPlanner";
+
+async function resetCache() {
+  const connection = await mongoose.connect(process.env.MONGODB_URI, {
+    dbName:
+      process.env.NODE_ENV === "production" ? "exams" : "exams_development",
+  });
+
+  console.time("🧹 Clear Mongo Cache");
+  await Promise.all([
+    UserExamModel.collection.drop().catch(() => UserExamModel.deleteMany()),
+    UserExamPlannerModel.collection
+      .drop()
+      .catch(() => UserExamPlannerModel.deleteMany()),
+  ]);
+  console.timeEnd("🧹 Clear Mongo Cache");
+  connection.disconnect();
+}
 
 async function seed() {
+  console.log("\nEnvironment:", process.env.NODE_ENV, "\n");
+
+  await resetCache();
+
   const filePath = path.resolve(
     "prisma/data/2025_first_semester/final/base.csv"
   );
   console.log("🌱 Reading CSV:", filePath);
-
   // Read CSV file
   const csvText = fs.readFileSync(filePath, "utf-8");
   const lines = csvText
@@ -33,10 +57,11 @@ async function seed() {
         if (!DateStr || isNaN(Date.parse(DateStr))) return null;
 
         const date = new Date(DateStr);
-
+        const { from: timeFrom, to: timeTo } = timeRangeToMinutes(Time);
         return {
           date,
-          time: Time,
+          timeFrom,
+          timeTo,
           subjectCode: SubjectCode.replace(/\s*\(.*\)$/, ""),
           sectionCode: Group,
           room: Room,

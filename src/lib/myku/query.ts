@@ -2,6 +2,7 @@ import "server-only";
 import axios from "axios";
 import { headers } from "./utils";
 import {
+  GetStudentEnrollSubject,
   GetMyCourseResponseInterface,
   GetOpenSubjectResponseInterface,
 } from "./types";
@@ -31,6 +32,15 @@ export class MyKuQueryInstance {
     if (!subjectCode) throw new Error("subjectCode is required!");
     return axios.get<GetOpenSubjectResponseInterface>(
       `https://my.ku.th/myku/api/enroll/openSubjectForEnroll?query=${subjectCode}&academicYear=2568&semester=1&campusCode=K&section=`,
+      { headers: headers(this.token) }
+    );
+  }
+  getEnrollSubject(stdId: string, semester: string, academicYear: string) {
+    if (!stdId || !semester || !academicYear)
+      throw new Error("stdId | semester | academicYear is required!");
+    return axios.post<GetStudentEnrollSubject>(
+      "https://my.ku.th/myku/api/enroll/searchEnrollResult",
+      JSON.stringify({ stdId, semester, academicYear }),
       { headers: headers(this.token) }
     );
   }

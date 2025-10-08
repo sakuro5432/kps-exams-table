@@ -1,4 +1,4 @@
-import { CourseSchedule } from "./generated/prisma";
+import { $Enums, CourseSchedule } from "./generated/prisma";
 
 type Course = Omit<CourseSchedule, "createdAt" | "updatedAt" | "deletedAt"> & {
   stdCode: string;
@@ -7,7 +7,7 @@ type Course = Omit<CourseSchedule, "createdAt" | "updatedAt" | "deletedAt"> & {
 type SubjectCodeResult = {
   sectionCode: string;
   subjectCodes: string;
-  sectionType: string;
+  sectionType: $Enums.SectionType;
 };
 
 export function getSubjectCodesFromCourses(

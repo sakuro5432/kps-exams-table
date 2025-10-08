@@ -7,14 +7,17 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { app } from "@/lib/myku";
 import { AxiosError } from "axios";
 import { prisma } from "@/lib/db";
-import { decodeJwt } from "jose";
+// import { decodeJwt } from "jose";
 import { revalidateMyCourse } from "@/controllers/revalidateMyCourse.controller";
 import { User as UserTable } from "@/lib/generated/prisma";
 import { referenceProcess, ReferenceType } from "./referenceName";
 import { signInSchema } from "@/zod/auth";
 import { envServer } from "@/env/server.mjs";
-import LogModel, { LogAction } from "@/mongoose/model/Log";
+import LogModel, { LogAction, LoginDetail } from "@/mongoose/model/Log";
 import mongoConnect from "@/mongoose/connect";
+import { createSession, revokeSession, validateSession } from "@/lib/session";
+
+mongoConnect();
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -44,9 +47,21 @@ export const authOptions: NextAuthOptions = {
             throw new Error("โปรดกรอกรหัสนิสิต/รหัสผ่าน");
           }
           if (res.data.user.student.campusCode !== "K") {
+            await LogModel.create({
+              stdCode: res.data.user.student.stdCode,
+              action: LogAction.LOGIN,
+              success: false,
+              detail: LoginDetail.เฉพาะนิสิตเท่านั้น,
+            });
             throw new Error("เฉพาะนิสิตวิทยาเขตกำแพงแสน");
           }
           if (res.data.user.userType !== "1") {
+            await LogModel.create({
+              stdCode: res.data.user.student.stdCode,
+              action: LogAction.LOGIN,
+              success: false,
+              detail: LoginDetail.เฉพาะนิสิตเท่านั้น,
+            });
             throw new Error("เฉพาะนิสิตเท่านั้น (กลัวระบบพังจัฟ 😢)");
           }
 
@@ -144,13 +159,24 @@ export const authOptions: NextAuthOptions = {
             });
           }
           // --- END CHECKPOINT ON LOCAL SERVER
-
+          const sessionId = await createSession(res.data.user.student.stdCode);
           const user: UserDataRequired = {
-            id: res.data.user.idCode,
+            id: res.data.user.student.stdCode,
             name: completeName,
-            studentInfo: basicInfo,
+            studentInfo: {
+              ...basicInfo,
+              email: undefined,
+              mobileNo: undefined,
+              facultyCode: undefined,
+              majorCode: undefined,
+              departmentCode: undefined,
+              majorNameTh: student.majorNameTh,
+              facultyNameTh: student.facultyNameTh,
+              studentStatusNameTh: student.studentStatusNameTh,
+            },
             accesstoken: res.data.accesstoken,
             role: findUser?.role || "STUDENT",
+            sessionId,
           };
           return user;
         } catch (error) {
@@ -179,12 +205,11 @@ export const authOptions: NextAuthOptions = {
   },
   callbacks: {
     jwt: async ({ token, account, user }) => {
-      if (account && account.userId) {
-        token.id = account.userId;
-      }
       if (user) {
+        token.id = user.id;
         token.studentInfo = user.studentInfo;
         token.accesstoken = user.accesstoken;
+        token.sessionId = user.sessionId;
       }
       return token;
     },
@@ -192,30 +217,19 @@ export const authOptions: NextAuthOptions = {
       session.user.id = token.id;
       session.user.studentInfo = token.studentInfo;
       session.user.accesstoken = token.accesstoken;
+      session.user.sessionId = token.sessionId;
       return session;
     },
   },
   events: {
     async signIn({ user }) {
       try {
-        await mongoConnect();
-        await LogModel.create({
-          stdCode: user.studentInfo.stdCode,
-          action: LogAction.LOGIN,
-        });
-        await prisma.user.update({
-          where: { stdCode: user.studentInfo.stdCode },
-          data: { loggedCount: { increment: 1 } },
-        });
         const registeredCourse = await prisma.registeredCourse.count({
-          where: { stdCode: user.studentInfo.stdCode },
+          where: { stdCode: user.id },
         });
         if (registeredCourse === 0) {
           try {
-            await revalidateMyCourse(
-              user.studentInfo.stdCode,
-              user.accesstoken
-            );
+            await revalidateMyCourse(user.id, user.accesstoken);
           } catch (error) {
             console.error("Error collecting and saving courses:", error);
           }
@@ -224,27 +238,55 @@ export const authOptions: NextAuthOptions = {
         console.error("Error in signIn event:", error);
       }
     },
-    async signOut({ session, token }) {
+    async signOut({ token }) {
       try {
+        const isValidate = await validateSession(token.id, token.sessionId);
+        if (isValidate) {
+          await revokeSession(token.id, token.sessionId);
+          return;
+        }
+        const isSessionNotDelete = await prisma.session.findUnique({
+          where: {
+            id: token.sessionId,
+            stdCode: token.id,
+            revokedAt: null,
+          },
+        });
+        if (isSessionNotDelete) {
+          await prisma.session.update({
+            where: {
+              id: token.sessionId,
+              stdCode: token.id,
+              revokedAt: null,
+            },
+            data: { revokedAt: new Date() },
+          });
+        }
+
         await LogModel.create({
-          stdCode: token.studentInfo.stdCode,
+          stdCode: token.id,
           action: LogAction.LOGOUT,
         });
-        app.logout(token.studentInfo.loginName, token.accesstoken);
+        app.logout(token.studentInfo.loginName, token.sessionId);
       } catch (error) {
         console.error("Error in signOut event:", error);
       }
     },
-    async session({ session, token }) {
+    async session({ session }) {
       try {
-        await mongoConnect();
-        if (
-          envServer.NODE_ENV === "production" &&
-          Math.floor(Date.now() / 1000) >
-            Number(decodeJwt(token.accesstoken).exp)
-        ) {
+        const { id: userId, sessionId, forceLogout } = session.user;
+        const isActive = await validateSession(userId, sessionId);
+        if (!isActive && !forceLogout) {
           session.user.forceLogout = true;
+          // token can't re-assign here
         }
+        // if (
+        //   envServer.NODE_ENV === "production" &&
+        //   Math.floor(Date.now() / 1000) >
+        //     Number(decodeJwt(token.sessionId).exp)
+        // ) {
+        //   session.user.forceLogout = true;
+        // }
       } catch (error) {
         console.error("Error in session event:", error);
       }

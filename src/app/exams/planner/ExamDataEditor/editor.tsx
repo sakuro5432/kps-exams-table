@@ -22,17 +22,17 @@ import FormCalendar from "@/components/FormCalendar";
 import { FormTimeRangeInput } from "@/components/FormTimeInput";
 import lodash from "lodash";
 import { sectionTypeTranslator } from "@/utils/section";
-import { extractTimeRange } from "@/utils/date";
-import { UserPlannerData } from "@/types/userExamPlanner.types";
+import { minutesRangeToTimeStrings } from "@/utils/date";
+import { UserExamPlannerData } from "@/types/userExamPlanner.types";
 type FormValue = z.infer<typeof schema>;
 
 interface Props {
-  data: UserPlannerData;
-  setSelected: (data: UserPlannerData | null) => void;
+  data: UserExamPlannerData;
+  setSelected: (data: UserExamPlannerData | null) => void;
 }
 
 export function FormEditor({ data, setSelected }: Props) {
-  const d = extractTimeRange(data.schedule?.time || "");
+  const d = minutesRangeToTimeStrings(data.schedule?.timeFrom, data.schedule?.timeTo);
   const [isDefaultValue, setDefaultValue] = useState({
     id: data.id,
     subjectCode: data.subjectCode,
@@ -110,8 +110,7 @@ export function FormEditor({ data, setSelected }: Props) {
           <CardHeader>
             <CardTitle>วิชา: {data.subjectNameTh}</CardTitle>
             <CardDescription className="font-medium">
-              {data.subjectCode} /{" "}
-              {sectionTypeTranslator(data.sectionType, true)}
+              {data.subjectCode} / {sectionTypeTranslator(data.sectionType)}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">

@@ -2,6 +2,7 @@ import "server-only";
 import { prisma } from "@/lib/db";
 import { app } from "@/lib/myku";
 import { AxiosError } from "axios";
+import { formatTimeRange } from "@/utils/date";
 
 const omit = { omit: { dayW: true } };
 
@@ -56,7 +57,7 @@ export async function searchOpenCourse(
         sectionType: x.sectionType,
         roomNameTh: x.roomNameTh,
         teacherName: x.teacherName,
-        time: x.timeFrom.concat("-", x.timeTo),
+        time: formatTimeRange(x.timeFrom, x.timeTo),
         subjectCode: x.subjectCode,
       })),
       code: "SUCCESS",

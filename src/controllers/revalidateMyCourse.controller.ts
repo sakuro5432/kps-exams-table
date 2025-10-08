@@ -1,13 +1,12 @@
 import "server-only";
 import { prisma } from "@/lib/db";
-import { filterExamScheduleByStudent } from "@/lib/filter";
 import { Prisma } from "@/lib/generated/prisma";
 import { getMyCourse } from "./getMyCourse.controller";
 import { uniqueBy } from "@/lib/utils";
-import UserExamModel from "@/mongoose/model/UserExam";
+import { getSubjectCodesFromCourses } from "@/lib/subjectCode";
+import { filterExamScheduleByStudent } from "@/lib/filter";
 import { envServer } from "@/env/server.mjs";
-import { getSubjectCodesFromCourses } from "@/lib/getSubjectCodesFromCourses";
-import mongoConnect from "@/mongoose/connect";
+import UserExamModel from "@/mongoose/model/UserExam";
 
 export async function revalidateMyCourse(stdCode: string, token: string) {
   try {
@@ -91,7 +90,7 @@ export async function revalidateMyCourse(stdCode: string, token: string) {
           subjectCode: {
             startsWith: code.subjectCodes,
           },
-          OR: [{ sectionType: code.sectionType }, { sectionType: null }],
+          sectionType: code.sectionType,
           sectionCode: { contains: code.sectionCode },
           deletedAt: null,
         })),

@@ -8,7 +8,7 @@ export default async function Page() {
   const isAuth = await Auth();
   if (!isAuth) redirect("/login");
 
-  const { stdCode } = isAuth;
+  const { id: stdCode } = isAuth.session;
 
   const result = await getUserExamPlanner(stdCode);
 
@@ -19,7 +19,7 @@ export default async function Page() {
         <h1 className="text-2xl font-semibold underline">จัดตารางสอบ</h1>
       </div>
       <h2>
-        วิชาส่วนกลางจะไม่แสดงที่นี่และจะไม่สามารถแก้ไขได้เอง
+        วิชาจากตารางส่วนกลางจะไม่แสดงที่นี่และจะไม่สามารถแก้ไขได้เอง
         <br />
         <span className="font-medium">ทำได้แค่โน๊ตไว้</span>
       </h2>

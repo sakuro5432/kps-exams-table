@@ -1,6 +1,7 @@
-import { OpenSubjectForEnrollInterface } from "@/interfaces/OpenSubjectForEnrollInterface";
-import { GroupCourseResponseInterface } from "@/interfaces/GroupCourseResponseInterface";
+import { OpenSubjectForEnrollInterface } from "@/interfaces/OpenSubjectForEnroll.interface";
+import { GroupCourseResponseInterface } from "@/interfaces/GroupCourseResponse.interface";
 import { LoginProfile } from "@/types/signIn.types";
+import { EnrollData } from "@/interfaces/EnrollData.interface";
 
 export interface SignInServicePropsInterface {
   username: string;
@@ -27,7 +28,10 @@ export interface GetMyCourseResponseInterface {
   results: GroupCourseResponseInterface[];
   cache: boolean;
 }
+
 export interface GetOpenSubjectResponseInterface {
   code: string;
   results: OpenSubjectForEnrollInterface[];
 }
+
+export interface GetStudentEnrollSubject extends EnrollData {}
