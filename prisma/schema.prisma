@@ -51,6 +51,23 @@ model User {
   UserReview        UserReview[]
   UserExamNote      UserExamNote[]
   ExamSchedule      ExamSchedule[]
+  Session           Session[]
+}
+
+model Session {
+  id        String    @id @default(nanoid(10)) @db.VarChar(100)
+  stdCode   String    @db.VarChar(100)
+  ip        String?   @db.VarChar(45) // IPv4/IPv6
+  userAgent String?   @db.Text
+  createdAt DateTime  @default(now()) @db.DateTime(0)
+  expiredAt DateTime  @db.DateTime(0)
+  revokedAt DateTime? @db.DateTime(0)
+
+  user User @relation(fields: [stdCode], references: [stdCode])
+
+  @@index([stdCode])
+  @@index([expiredAt])
+  @@index([stdCode, expiredAt]) // composite index: ค้นหาของ user ที่ยังไม่หมดอายุได้ไว
 }
 
 // model Copen {
