@@ -4,6 +4,7 @@ import "./globals.css";
 import { Providers } from "./providers";
 import { cn } from "@/lib/utils";
 import Navbar from "@/components/Navbar";
+import { GitHubLogoIcon } from "@radix-ui/react-icons";
 
 const font = IBM_Plex_Sans_Thai({
   subsets: ["latin", "thai"],
@@ -28,10 +29,25 @@ export default function RootLayout({
             <Navbar />
             {children}
           </main>
-          <footer className="bg-primary text-white text-center p-2">
-            <a href="https://discord.gg/P5snQfWB" className="underline">
-              แจ้งปัญหา / อัพเดทข้อมูล ทาง Discord
-            </a>
+          <footer className="w-full">
+            <div className="bg-primary text-center text-white p-2">
+              <a
+                href="https://discord.gg/vfTDdjtr"
+                className="underline"
+                target="_blank"
+              >
+                แจ้งปัญหา / อัพเดทข้อมูล ทาง Discord
+              </a>
+            </div>
+            <div className="bg-primary/95 p-2 hidden xl:block">
+              <a
+                href="https://github.com/nokamui123/kps-exams-table"
+                target="_blank"
+                className="flex gap-2 items-center justify-center text-white"
+              >
+                <GitHubLogoIcon /> Source Code
+              </a>
+            </div>
           </footer>
         </Providers>
       </body>

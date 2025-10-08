@@ -1,10 +1,14 @@
+"use server";
 import { z } from "zod";
 import pkg from "@next/env";
 
 const projectDir = process.cwd();
 pkg.loadEnvConfig(projectDir);
 
-export const envSchema = z.object({
+const projectDir = process.cwd();
+pkg.loadEnvConfig(projectDir);
+
+const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"], {
     message:
       "NODE_ENV is required and must be one of 'development', 'test', or 'production'",

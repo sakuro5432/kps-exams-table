@@ -121,7 +121,7 @@ export const authOptions: NextAuthOptions = {
             await prisma.advisor.create({
               data: {
                 advisorId: student.advisorId,
-                advisorNameTh: student.advisorNameTh,
+                advisorNameTh: student.advisorNameTh.trim(),
                 positionTh: student.positionTh,
               },
             });

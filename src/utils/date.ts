@@ -1,10 +1,16 @@
 export function formatThaiDate(date: Date | string): string {
   const thaiDate = new Date(date);
 
-  const weekday = thaiDate.toLocaleDateString("th-TH", { weekday: "long" });
-  const day = thaiDate.getDate();
-  const month = thaiDate.toLocaleDateString("th-TH", { month: "long" });
-  return weekday.concat("ที่ ", day.toString(), " ", month);
+  // Set the options for formatting
+  const options: Intl.DateTimeFormatOptions = {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    timeZone: "Asia/Bangkok",
+  };
+
+  // Format the date in Thai locale and replace the space
+  return utcDate.toLocaleDateString("th-TH", options);
 }
 
 export function timeStringToMinutes(str: string) {
