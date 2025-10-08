@@ -127,12 +127,11 @@ export function FormTimeRangeInput({
     <div>
       <span className="text-sm">{label}</span>
       <div className="flex items-center gap-1">
-        <div className="flex flex-col">
+        <div className="flex flex-col gap-1">
           <Button
             type="button"
             size="icon"
-            variant="ghost"
-            className="h-5 w-5"
+            variant="outline"
             onClick={() => updateFn({ ...time, hours: (time.hours + 1) % 24 })}
             disabled={disabled}
           >
@@ -152,8 +151,7 @@ export function FormTimeRangeInput({
           <Button
             type="button"
             size="icon"
-            variant="ghost"
-            className="h-5 w-5"
+            variant="outline"
             onClick={() =>
               updateFn({ ...time, hours: (time.hours - 1 + 24) % 24 })
             }
@@ -163,12 +161,11 @@ export function FormTimeRangeInput({
           </Button>
         </div>
         <span className="text-sm font-medium">:</span>
-        <div className="flex flex-col">
+        <div className="flex flex-col gap-1">
           <Button
             type="button"
             size="icon"
-            variant="ghost"
-            className="h-5 w-5"
+            variant="outline"
             onClick={() =>
               updateFn({ ...time, minutes: (time.minutes + 10) % 60 })
             }
@@ -190,8 +187,7 @@ export function FormTimeRangeInput({
           <Button
             type="button"
             size="icon"
-            variant="ghost"
-            className="h-5 w-5"
+            variant="outline"
             onClick={() =>
               updateFn({ ...time, minutes: (time.minutes - 10 + 60) % 60 })
             }
@@ -204,16 +200,24 @@ export function FormTimeRangeInput({
     </div>
   );
   return (
-    <div className={cn("flex flex-col space-y-2", className)}>
+    <div className={cn("flex flex-col space-y-5", className)}>
       <div className="flex space-x-10 items-center">
-        {buildTimeInput("สิ้นสุดเวลา", endTime, updateEnd)}
+        {buildTimeInput("เวลาสิ้นสุด", endTime, updateEnd)}
         {buildTimeInput("เริ่มเวลา", startTime, updateStart)}
       </div>
       {hasError && (
         <p className="text-sm text-red-500 mt-1">
-          ช่วงเวลาต้องไม่น้อยกว่า {minDurationMinutes / 60} ชั่วโมง
+          Error: ช่วงเวลาสอบต้องไม่น้อยกว่า {minDurationMinutes / 60} ชั่วโมง!
         </p>
       )}
+      <div>
+        <p className="text-destructive text-sm">
+          * แนะนำให้แก้ไขที่ &quot;เวลาสิ้นสุด&quot; ให้เสร็จก่อน
+        </p>
+        <p className="text-destructive text-sm">
+          * ชั่วโมงสอบต้องไม่น้อยกว่า {minDurationMinutes / 60} ชั่วโมง
+        </p>
+      </div>
     </div>
   );
 }
