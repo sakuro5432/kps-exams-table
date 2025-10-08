@@ -18,8 +18,7 @@ export async function action() {
       };
 
     const {
-      stdCode,
-      session: { accesstoken },
+      session: { id: stdCode, accesstoken },
     } = isAuth;
     const lastRequest = await prisma.requestUpdate.findFirst({
       where: { stdCode },

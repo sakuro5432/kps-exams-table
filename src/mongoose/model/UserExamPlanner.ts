@@ -1,3 +1,4 @@
+import { $Enums } from "@/lib/generated/prisma";
 import mongoose, { Document, Model, Schema } from "mongoose";
 export interface IUserExamPlannerExam {
   id: string;
@@ -10,8 +11,8 @@ export interface IUserExamPlannerExam {
   schedule: {
     date: Date;
     room: string;
-    dateTh: string;
-    time: string;
+    timeFrom: number;
+    timeTo: number;
   } | null;
 }
 
@@ -31,17 +32,21 @@ const ExamSchema = new Schema<IUserExamPlannerExam>(
     sectionCode: { type: String, required: true },
     sectionId: { type: Number, required: true },
     subjectNameTh: { type: String, required: true },
-    sectionType: { type: String, required: true },
+    sectionType: {
+      type: String,
+      enum: Object.values($Enums.SectionType), // ✅ fix here
+      required: true,
+    },
     teacherName: { type: String, default: null },
     subjectCode: { type: String, required: true },
 
     schedule: {
-      type: new Schema(
+      type: new Schema<IUserExamPlannerExam["schedule"]>(
         {
           date: { type: Date, required: true },
           room: { type: String, required: true },
-          dateTh: { type: String, required: true },
-          time: { type: String, required: true },
+          timeFrom: { type: Number, required: true },
+          timeTo: { type: Number, required: true },
         },
         { _id: false }
       ),

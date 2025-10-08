@@ -1,83 +1,99 @@
-import { RegisteredCourseType, MatchedExamType } from "@/types/schedule.types";
-import { ExamSchedule } from "@/lib/generated/prisma";
+import {
+  ExamScheduleDataType,
+  GroupedExamSchedules,
+  MatchedExamType,
+  RegisteredCourseType,
+} from "@/types/schedule.types";
+import { ExamSchedule } from "./generated/prisma";
 
-import { isBefore, startOfDay, compareAsc } from "date-fns";
-
-export function groupByDate<T extends { dateTh: string; time: string; date: Date }>(
-  items: T[]
-): {
-  label: string;
-  date: Date;
-  items: (T & { isTimeDuplicate?: boolean })[];
-}[] {
-  const grouped = items.reduce((acc, item) => {
-    if (!acc[item.dateTh]) {
-      acc[item.dateTh] = [];
-    }
-    acc[item.dateTh].push(item);
+/**
+ * Group exam schedules by same date, reorder by time,
+ * detect overlaps, and link same-time exams.
+ */
+export function groupByDate(
+  exams: ExamScheduleDataType[]
+): GroupedExamSchedules[] {
+  const grouped = exams.reduce((acc, exam) => {
+    const dateKey = exam.date.toISOString().split("T")[0];
+    if (!acc[dateKey]) acc[dateKey] = [];
+    acc[dateKey].push(exam);
     return acc;
-  }, {} as Record<string, (T & { isTimeDuplicate?: boolean })[]>);
+  }, {} as Record<string, ExamScheduleDataType[]>);
 
-  const getStartEnd = (time: string) => {
-    const [start, end] = time.split("-").map((t) => t.trim());
-    const toMinutes = (t: string) => {
-      const [h, m] = t.split(":").map(Number);
-      return h * 60 + m;
-    };
-    return {
-      start: toMinutes(start.replace(".", ":")),
-      end: toMinutes(end.replace(".", ":")),
-    };
-  };
+  // keep a global counter across all days
+  let globalGroupCounter = 1;
 
-  for (const date in grouped) {
-    const exams = grouped[date];
-    exams.sort((a, b) => getStartEnd(a.time).start - getStartEnd(b.time).start);
+  return Object.entries(grouped).map(([date, exams]) => {
+    const sorted = [...exams].sort(
+      (a, b) => (a.timeFrom ?? 0) - (b.timeFrom ?? 0)
+    );
 
-    for (let i = 1; i < exams.length; i++) {
-      const current = getStartEnd(exams[i].time);
-      for (let j = 0; j < i; j++) {
-        const prev = getStartEnd(exams[j].time);
-        const isOverlap =
-          Math.max(current.start, prev.start) < Math.min(current.end, prev.end);
-        if (isOverlap) {
-          exams[i].isTimeDuplicate = true;
-          break;
-        }
-      }
+    // pass and receive the next counter value
+    const { marked, nextCounter } = groupOverlaps(sorted, globalGroupCounter);
+    globalGroupCounter = nextCounter;
+
+    return { date, exams: marked };
+  });
+}
+
+/**
+ * Link exams that overlap or occur in the same time range.
+ * Keeps counting groupId from previous day.
+ */
+function groupOverlaps(
+  exams: ExamScheduleDataType[],
+  startCounter: number
+): {
+  marked: (ExamScheduleDataType & { isOverlap: boolean; groupId: number | null })[];
+  nextCounter: number;
+} {
+  const marked = exams.map((e) => ({
+    ...e,
+    isOverlap: false,
+    groupId: null as number | null,
+  }));
+
+  let groupCounter = startCounter;
+
+  for (let i = 0; i < marked.length; i++) {
+    const a = marked[i];
+    if (a.groupId !== null) continue;
+    if (typeof a.timeFrom !== "number" || typeof a.timeTo !== "number") continue;
+
+    const groupMembers = [a];
+    for (let j = i + 1; j < marked.length; j++) {
+      const b = marked[j];
+      if (typeof b.timeFrom !== "number" || typeof b.timeTo !== "number") continue;
+
+      const overlap = a.timeFrom < b.timeTo && b.timeFrom < a.timeTo;
+      if (overlap) groupMembers.push(b);
+    }
+
+    if (groupMembers.length > 1) {
+      groupMembers.forEach((m) => {
+        m.isOverlap = true;
+        m.groupId = groupCounter;
+      });
+      groupCounter++;
     }
   }
 
-  return Object.entries(grouped)
-    .map(([dateTh, items]) => ({
-      label: dateTh,
-      date: items[0].date,
-      items,
-    }))
-    .sort((a, b) => {
-      const today = startOfDay(new Date());
-      const aPast = isBefore(startOfDay(a.date), today);
-      const bPast = isBefore(startOfDay(b.date), today);
-
-      if (aPast && !bPast) return 1; // a เป็นอดีต → ลงล่าง
-      if (!aPast && bPast) return -1; // b เป็นอดีต → ลงล่าง
-      return compareAsc(a.date, b.date); // เรียงวันจากน้อยไปมากในกลุ่มเดียวกัน
-    });
+  return { marked, nextCounter: groupCounter };
 }
 
 
 export function filterExamScheduleByStudent(
-  todo: ExamSchedule[],
-  data: RegisteredCourseType[] | null,
+  examSchedules: ExamSchedule[],
+  userRegisteredCourses: RegisteredCourseType[],
   stdCode: string
 ): MatchedExamType[] {
-  if (!data) return [];
+  if (!userRegisteredCourses) return [];
 
   const studentId = BigInt(stdCode);
 
-  return todo
+  return examSchedules
     .map((x): MatchedExamType | null => {
-      const course = data.find((r) => {
+      const course = userRegisteredCourses.find((r) => {
         const registeredSubjectCode = r.subjectCode.replace(/–/g, "-");
         const examSubjectCode = x.subjectCode.replace(/–/g, "-");
 

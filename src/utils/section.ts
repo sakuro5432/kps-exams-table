@@ -1,16 +1,21 @@
-export const sectionTypeTranslator = (int: string, isExam?: boolean) => {
+import { $Enums } from "@/lib/generated/prisma";
+
+export const sectionTypeTranslator = (
+  code: $Enums.SectionType,
+  isExam?: boolean
+) => {
   if (isExam) {
-    if (int === "16901") {
+    if (code === "LECT") {
       return "ทั่วไป";
     }
-    if (int === "16902") {
+    if (code === "LAB") {
       return "ปฏิบัติ";
     }
   }
-  if (int === "16901") {
+  if (code === "LECT") {
     return "บรรยาย";
   }
-  if (int === "16902") {
+  if (code === "LAB") {
     return "ปฏิบัติ";
   }
   return "ไม่ทราบ";

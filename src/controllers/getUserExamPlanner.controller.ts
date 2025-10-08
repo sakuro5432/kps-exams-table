@@ -1,12 +1,14 @@
 import "server-only";
 import { prisma } from "@/lib/db";
-import { UserPlannerData } from "@/types/userExamPlanner.types";
+import { UserExamPlannerData } from "@/types/userExamPlanner.types";
 import UserExamPlannerModel from "@/mongoose/model/UserExamPlanner";
+import { $Enums } from "@/lib/generated/prisma";
+import { envServer } from "@/env/server.mjs";
 
 interface Props {
   stdCode: string;
 }
-async function getPlannerData({ stdCode }: Props): Promise<UserPlannerData[]> {
+async function getPlannerData({ stdCode }: Props): Promise<UserExamPlannerData[]> {
   const exceptIDs = await prisma.userExamSchedule.findMany({
     where: {
       stdCode,
@@ -37,24 +39,26 @@ async function getPlannerData({ stdCode }: Props): Promise<UserPlannerData[]> {
     where: {
       stdCode,
       deletedAt: null,
-      ExamSchedule: { NOT: { reportBy: "SYSTEM" } },
+      ExamSchedule: {
+        reportBy: { notIn: ["ADMIN", "SEED"] },
+      },
     },
     include: {
       ExamSchedule: {
-        select: { date: true, dateTh: true, room: true, time: true },
+        select: { date: true, room: true, timeFrom: true, timeTo: true },
       },
     },
   });
 
-  const result: UserPlannerData[] = registeredCourse.map((x) => {
-    let schedule: UserPlannerData["schedule"] = null;
+  const result: UserExamPlannerData[] = registeredCourse.map((x) => {
+    let schedule: UserExamPlannerData["schedule"] = null;
     const s = planByUser.find((y) => y.sectionId === x.sectionId);
     if (s) {
       schedule = {
         date: s.ExamSchedule.date,
-        dateTh: s.ExamSchedule.dateTh,
         room: s.ExamSchedule.room,
-        time: s.ExamSchedule.time,
+        timeFrom: s.ExamSchedule.timeFrom,
+        timeTo: s.ExamSchedule.timeTo,
       };
     }
     return {
@@ -72,10 +76,19 @@ async function getPlannerData({ stdCode }: Props): Promise<UserPlannerData[]> {
   return result;
 }
 export async function getUserExamPlanner(stdCode: string) {
-  const cached = await UserExamPlannerModel.findOne({ stdCode }).lean();
-  if (cached) return cached.exams;
+  if (envServer.NODE_ENV === "production") {
+    const cached = await UserExamPlannerModel.findOne({ stdCode }).lean();
+    if (cached) {
+      return cached.exams.map((x) => ({
+        ...x,
+        sectionType: x.sectionType as $Enums.SectionType,
+      }));
+    }
+  }
   // fallback ไป query จาก SQL + สร้าง cache
   const exams = await getPlannerData({ stdCode });
-  await UserExamPlannerModel.create({ stdCode, exams });
+  if (envServer.NODE_ENV === "production") {
+    await UserExamPlannerModel.create({ stdCode, exams });
+  }
   return exams;
 }

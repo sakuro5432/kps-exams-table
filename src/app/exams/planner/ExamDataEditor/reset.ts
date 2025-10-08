@@ -2,12 +2,10 @@
 import { envServer } from "@/env/server.mjs";
 import { Auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import mongoConnect from "@/mongoose/connect";
 import { revalidateMultiPath } from "@/lib/revalidateMultiPath";
 import { TableSource } from "@/mongoose/enum/TableSource";
 import LogModel, { LogAction } from "@/mongoose/model/Log";
 import UserExamModel from "@/mongoose/model/UserExam";
-import { revalidatePath } from "next/cache";
 import UserExamPlannerModel from "@/mongoose/model/UserExamPlanner";
 
 type ResponseCode =
@@ -30,7 +28,7 @@ export async function resetUpdate(id: string): Promise<ResponseData> {
     if (!isAuth) {
       return { message: "โปรดเข้าสู่ระบบ", code: "UNAUTHORIZED" };
     }
-    const { stdCode } = isAuth;
+    const { id: stdCode } = isAuth.session;
     return await prisma.$transaction(async (tx) => {
       const validCourse = await tx.registeredCourse.findUnique({
         where: { id, deletedAt: null, stdCode },
@@ -80,18 +78,20 @@ export async function resetUpdate(id: string): Promise<ResponseData> {
         });
       }
 
-      const userExamModelCache = await UserExamModel.findOne({ stdCode });
-      if (userExamModelCache) {
-        const s = userExamModelCache.exams.findIndex(
-          (x) => x.id === userExamId.id
-        );
-        if (s !== -1) {
-          userExamModelCache.exams.splice(s, 1); // ลบออกจาก array
-          userExamModelCache.markModified("exams");
-          await userExamModelCache.save();
+      if (envServer.NODE_ENV === "production") {
+        const userExamModelCache = await UserExamModel.findOne({ stdCode });
+        if (userExamModelCache) {
+          const s = userExamModelCache.exams.findIndex(
+            (x) => x.id === userExamId.id
+          );
+          if (s !== -1) {
+            userExamModelCache.exams.splice(s, 1); // ลบออกจาก array
+            userExamModelCache.markModified("exams");
+            await userExamModelCache.save();
+          }
         }
+        await UserExamPlannerModel.findOneAndDelete({ stdCode });
       }
-      await UserExamPlannerModel.findOneAndDelete({ stdCode });
 
       await LogModel.create({
         stdCode,

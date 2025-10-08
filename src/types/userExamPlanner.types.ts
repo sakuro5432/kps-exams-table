@@ -1,15 +1,17 @@
-export type UserPlannerData = {
+import { $Enums } from "@/lib/generated/prisma";
+
+export type UserExamPlannerData = {
   id: string;
   sectionCode: string;
   sectionId: number;
   subjectNameTh: string;
-  sectionType: string;
+  sectionType: $Enums.SectionType;
   teacherName: string | null;
   subjectCode: string;
   schedule: {
     date: Date;
     room: string;
-    dateTh: string;
-    time: string;
+    timeFrom: number;
+    timeTo: number;
   } | null;
 };

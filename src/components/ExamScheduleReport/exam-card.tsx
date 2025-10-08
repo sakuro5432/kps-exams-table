@@ -1,30 +1,34 @@
-import { ExamScheduleType } from "@/types/schedule.types";
-import { Badge } from "../ui/badge";
+import { ExamScheduleDataType } from "@/types/schedule.types";
 import NoteEditor from "./NoteEditor";
 import { BadgeSectionCode } from "../BadgeSectionCode";
 import { sectionTypeTranslator } from "@/utils/section";
-import { cn, isPast } from "@/lib/utils";
-// import DeleteButton from "./DeleteButton";
+import { formatTimeRange } from "@/utils/date";
+import { cn } from "@/lib/utils";
+import { envClient } from "@/env/client";
 
 interface Props {
-  data: ExamScheduleType;
+  data: ExamScheduleDataType & { groupId: number | null; isOverlap: boolean };
+  activeGroup: number | null;
+  setActiveGroup: (value: number | null) => void;
 }
-export function ExamCard({ data }: Props) {
+export function ExamCard({ data, activeGroup, setActiveGroup }: Props) {
   return (
     <div
       className={cn(
-        "space-y-2.5 border rounded p-4 bg-muted mb-2 relative w-full xl:min-w-lg",
-        isPast(data.date) && "opacity-60"
+        "space-y-2.5 border rounded p-4 bg-muted mb-2 relative w-full xl:min-w-lg transition",
+        activeGroup && data.groupId === activeGroup
+          ? "bg-destructive/10 border-destructive"
+          : data.isOverlap && "bg-yellow-50 border-yellow-500"
       )}
+      onMouseEnter={() => data.groupId && setActiveGroup(data.groupId)}
+      onMouseLeave={() => setActiveGroup(null)}
     >
-      {data.isTimeDuplicate && (
-        <Badge variant={"destructive"} className="absolute -top-3 ">
-          พบเวลาสอบอาจทับซ้อนกัน
-        </Badge>
-      )}
-      {process.env.NODE_ENV === "development" && <div>#{data.sectionId}</div>}
+      {envClient.NODE_ENV === "development" && <div>#{data.sectionId}</div>}
       <div>
-        เวลา: <span className="font-semibold">{data.time}</span>
+        เวลา:{" "}
+        <span className="font-semibold">
+          {formatTimeRange(data.timeFrom, data.timeTo)}
+        </span>
       </div>
       <div>
         ห้องสอบ: <span className="font-semibold">{data.room}</span>
@@ -52,7 +56,6 @@ export function ExamCard({ data }: Props) {
           </p>
         </div>
         <div className="flex justify-end flex-shrink-0 space-x-1">
-          {/* <DeleteButton data={data} /> */}
           <NoteEditor data={data} />
         </div>
       </div>

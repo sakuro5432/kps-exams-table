@@ -1,4 +1,4 @@
-import { UserPlannerData } from "@/types/userExamPlanner.types";
+import { UserExamPlannerData } from "@/types/userExamPlanner.types";
 
 type ResponseFetcherCode =
   | "UNAUTHORIZED"
@@ -8,5 +8,5 @@ type ResponseFetcherCode =
 export interface ResponseFetcherData {
   message: string;
   code: ResponseFetcherCode | string;
-  data?: UserPlannerData[] | null;
+  data?: UserExamPlannerData[] | null;
 }

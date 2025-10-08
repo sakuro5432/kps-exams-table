@@ -1,12 +1,13 @@
-import { ExamScheduleType } from "@/types/schedule.types";
+import { ExamScheduleDataType } from "@/types/schedule.types";
 import mongoose, { Model } from "mongoose";
 
 export interface IUserExam extends Document {
   stdCode: string;
-  exams: ExamScheduleType[];
+  exams: ExamScheduleDataType[];
+  createdAt: Date;
 }
 
-const ExamSchema = new mongoose.Schema<ExamScheduleType>(
+const ExamSchema = new mongoose.Schema<ExamScheduleDataType>(
   {
     id: {
       type: String,
@@ -15,27 +16,29 @@ const ExamSchema = new mongoose.Schema<ExamScheduleType>(
     room: { type: String, required: true },
     subjectCode: { type: String, required: true },
     subjectNameTh: { type: String, required: true },
-    dateTh: { type: String, required: true },
     date: { type: Date, required: true },
-    time: { type: String, required: true },
+    timeFrom: { type: Number, required: true },
+    timeTo: { type: Number, required: true },
     sectionCode: { type: String, required: true },
     sectionId: { type: Number, required: true },
-    studentIdRange: { type: String, default: null },
-    isTimeDuplicate: { type: Boolean, default: false },
+    // studentIdRange: { type: String, default: null },
     note: { type: String, default: null },
     sectionType: { type: String, required: true },
   },
   { _id: false }
 );
-
-const UserExamSchema = new mongoose.Schema(
+// const GroupedExamScheduleSchema = new mongoose.Schema<GroupedExamSchedules>({
+//   date: { type: String, required: true },
+//   exams: { type: [ExamSchema], required: true },
+// });
+const UserExamSchema = new mongoose.Schema<IUserExam>(
   {
     stdCode: {
       type: String,
       required: true,
     },
     exams: {
-      type: [ExamSchema], // อาร์เรย์ของ exam schedule
+      type: [ExamSchema],
       required: true,
     },
     createdAt: {
