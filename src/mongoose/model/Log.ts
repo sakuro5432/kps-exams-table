@@ -1,6 +1,11 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 import { TableSource } from "../enum/TableSource";
 
+export const LoginDetail = {
+  เฉพาะนิสิตเท่านั้น: "ONLY_STUDENT",
+  เฉพาะวิทยาเขตกำแพงแสน: "ONLY_KPS_CAMPUS",
+};
+
 export enum LogAction {
   LOGIN = "LOGIN",
   LOGOUT = "LOGOUT",
@@ -15,6 +20,7 @@ export enum LogAction {
 export interface ILogDocument extends Document {
   stdCode: string;
   action: LogAction;
+  success?: boolean;
   detail?: string;
   dataJson?: string;
   ip?: string;
@@ -33,6 +39,7 @@ const LogSchema = new Schema<ILogDocument>(
       required: true,
       enum: Object.values(LogAction), // บังคับให้ตรงกับ enum
     },
+    success: { type: Boolean },
     pkid: { type: String },
     tableSource: {
       type: String,

@@ -1,34 +1,30 @@
 import "server-only";
 import { prisma } from "../lib/db";
-import { groupByDate } from "../lib/filter";
 import UserExamModel from "@/mongoose/model/UserExam";
 import { envServer } from "@/env/server.mjs";
-import { ExamScheduleType } from "@/types/schedule.types";
+import { ExamScheduleDataType } from "@/types/schedule.types";
 
 export async function getMyExamSchedule(stdCode: string): Promise<{
-  data: {
-    label: string;
-    date: Date;
-    items: ExamScheduleType[];
-  }[];
-  requestUpdateAt: Date | null;
+  data: ExamScheduleDataType[];
+  // requestUpdateAt: Date | null;
 }> {
-  const user = await prisma.user.findUnique({
-    where: { stdCode },
-    select: { requestUpdateAt: true },
-  });
-  const requestUpdateAt = user?.requestUpdateAt || null;
+  // const user = await prisma.user.findUnique({
+  //   where: { stdCode },
+  //   select: { requestUpdateAt: true },
+  // });
+  // const requestUpdateAt = user?.requestUpdateAt || null;
   if (envServer.NODE_ENV == "production") {
     const cache = await UserExamModel.findOne({ stdCode }).lean();
     if (cache) {
       return {
-        data: groupByDate(JSON.parse(JSON.stringify(cache.exams))),
-        requestUpdateAt, // หรือถ้าต้องการดึง requestUpdateAt เพิ่มเติมก็ทำได้
+        data: cache.exams,
+        // requestUpdateAt, // หรือถ้าต้องการดึง requestUpdateAt เพิ่มเติมก็ทำได้
       };
     }
   }
 
   const data = await getUserExamSchedule(stdCode);
+
   // อัพเดตหรือสร้าง cache ใน MongoDB
   if (envServer.NODE_ENV == "production") {
     await UserExamModel.findOneAndUpdate(
@@ -39,14 +35,14 @@ export async function getMyExamSchedule(stdCode: string): Promise<{
   }
 
   return {
-    data: groupByDate(data),
-    requestUpdateAt,
+    data: data,
+    // requestUpdateAt,
   };
 }
 
 async function getUserExamSchedule(
   stdCode: string
-): Promise<ExamScheduleType[]> {
+): Promise<ExamScheduleDataType[]> {
   const data = await prisma.userExamSchedule.findMany({
     where: { stdCode, deletedAt: null },
     include: {
@@ -63,9 +59,9 @@ async function getUserExamSchedule(
       },
       ExamSchedule: {
         select: {
-          dateTh: true,
           date: true,
-          time: true,
+          timeFrom: true,
+          timeTo: true,
           studentIdRange: true,
           sectionCode: true,
           room: true,
@@ -91,7 +87,7 @@ async function getUserExamSchedule(
           ...ExamSchedule,
           sectionType: CourseSchedule.sectionType,
           note: rest.UserExamNote.at(0)?.note || null,
-        } as ExamScheduleType)
+        } as ExamScheduleDataType)
     )
     .sort((a, b) => Number(a.date) - Number(b.date));
 }

@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache";
 import UserExamModel from "@/mongoose/model/UserExam";
 import LogModel, { LogAction } from "@/mongoose/model/Log";
 import { TableSource } from "@/mongoose/enum/TableSource";
+import { envServer } from "@/env/server.mjs";
 
 type ResponseCode =
   | "UNAUTHORIZED"
@@ -38,7 +39,7 @@ export async function update(
         code: "INVALID_FORM",
       };
     }
-    const { stdCode } = isAuth;
+    const { id: stdCode } = isAuth.session;
     const { userExamId, note } = validForm.data;
 
     const search = await prisma.userExamNote.findUnique({
@@ -83,13 +84,15 @@ export async function update(
         });
       }
 
-      const cache = await UserExamModel.findOne({ stdCode });
-      if (cache) {
-        const s = cache.exams.findIndex((x) => x.id === userExamId);
-        if (s !== -1) {
-          cache.exams[s].note = note || null;
-          cache.markModified("exams");
-          await cache.save();
+      if (envServer.NODE_ENV === "production") {
+        const cache = await UserExamModel.findOne({ stdCode });
+        if (cache) {
+          const s = cache.exams.findIndex((x) => x.id === userExamId);
+          if (s !== -1) {
+            cache.exams[s].note = note || null;
+            cache.markModified("exams");
+            await cache.save();
+          }
         }
       }
       await LogModel.create({

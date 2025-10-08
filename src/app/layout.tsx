@@ -41,7 +41,7 @@ export default function RootLayout({
             </div>
             <div className="bg-primary/95 p-2 hidden xl:block">
               <a
-                href="https://github.com/nokamui123/kps-exams-table"
+                href="https://github.com/sakuro5432/kps-exams-table"
                 target="_blank"
                 className="flex gap-2 items-center justify-center text-white"
               >

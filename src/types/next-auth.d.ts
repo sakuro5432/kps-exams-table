@@ -11,6 +11,7 @@ declare module "next-auth" {
       forceLogout?: boolean;
       studentInfo: LoginProfile["student"];
       accesstoken: string;
+      sessionId: string;
       role: $Enums.UserRole;
     };
   }
@@ -26,9 +27,10 @@ declare module "next-auth" {
     email?: string;
     image?: string;
     forceLogout?: boolean;
-    studentInfo: LoginProfile["student"];
+    studentInfo: Omit<LoginProfile["student"], "firstNameEn", "lastNameEn">;
     accesstoken: string;
     role: $Enums.UserRole;
+    sessionId: string;
   }
   interface Profile {
     id: string;
@@ -49,5 +51,6 @@ declare module "next-auth/jwt" {
     studentInfo: LoginProfile["student"];
     accesstoken: string;
     role: $Enums.UserRole;
+    sessionId: string;
   }
 }

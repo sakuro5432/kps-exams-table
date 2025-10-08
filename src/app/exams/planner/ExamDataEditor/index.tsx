@@ -23,19 +23,21 @@ import {
 } from "@/components/ui/sheet";
 import { resetUpdate } from "./reset";
 import { toast } from "sonner";
-import { UserPlannerData } from "@/types/userExamPlanner.types";
+import { UserExamPlannerData } from "@/types/userExamPlanner.types";
+import { formatThaiDate, formatTimeRange } from "@/utils/date";
+import { envClient } from "@/env/client";
 const FormEditor = dynamic(() => import("./editor").then((x) => x.FormEditor), {
   ssr: false,
 });
 
 interface Props {
-  data: UserPlannerData[];
+  data: UserExamPlannerData[];
 }
 export function ExamDataEditor({ data }: Props) {
   const [open, setOpen] = useState(false); // for sheet
   const [mounted, setMounted] = useState(false);
   const isDesktop = useDesktop();
-  const [selected, setSelected] = useState<UserPlannerData | null>(null);
+  const [selected, setSelected] = useState<UserExamPlannerData | null>(null);
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -81,9 +83,9 @@ function ExamDataSheet({
   setOpen,
   onDelete,
 }: {
-  data: UserPlannerData[];
-  selected: UserPlannerData | null;
-  setSelected: (x: UserPlannerData | null) => void;
+  data: UserExamPlannerData[];
+  selected: UserExamPlannerData | null;
+  setSelected: (x: UserExamPlannerData | null) => void;
   open: boolean;
   setOpen: (value: boolean) => void;
   onDelete: (id: string) => void;
@@ -114,9 +116,9 @@ function ExamDataSheet({
 }
 
 function renderListingCard(
-  x: UserPlannerData,
-  selected: UserPlannerData | null,
-  setSelected: (x: UserPlannerData | null) => void,
+  x: UserExamPlannerData,
+  selected: UserExamPlannerData | null,
+  setSelected: (x: UserExamPlannerData | null) => void,
   setOpen?: (value: boolean) => void,
   onDelete?: (id: string) => void
 ) {
@@ -133,7 +135,7 @@ function renderListingCard(
 
         {/* Detail content */}
         <div className="p-2 space-y-1 flex-1">
-          {process.env.NODE_ENV === "development" && <div>#{x.sectionId}</div>}
+          {envClient.NODE_ENV === "development" && <div>#{x.sectionId}</div>}
           <div>
             รหัสวิชา: <span className="font-medium">{x.subjectCode} </span>
           </div>
@@ -155,8 +157,15 @@ function renderListingCard(
           </div>
           <div className="border-t pt-1"></div>
           <div className="font-medium">ห้องสอบ: {x.schedule?.room || "-"}</div>
-          <div className="font-medium">วันสอบ: {x.schedule?.dateTh || "-"}</div>
-          <div className="font-medium">เวลา: {x.schedule?.time || "-"}</div>
+          <div className="font-medium">
+            วันสอบ: {x.schedule ? formatThaiDate(x.schedule.date) : "-"}
+          </div>
+          <div className="font-medium">
+            เวลา:{" "}
+            {x.schedule
+              ? formatTimeRange(x.schedule.timeFrom, x.schedule.timeTo)
+              : "-"}
+          </div>
           <div className="flex gap-1 justify-end">
             {x.schedule && (
               <Button

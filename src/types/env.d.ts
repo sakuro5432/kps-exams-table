@@ -6,7 +6,8 @@ declare global {
       MONGODB_URI: string;
       NEXTAUTH_SECRET: string;
       NEXTAUTH_URL: string;
-      NEXT_PUBLIC_BASEURL?: string;
+      NEXT_PUBLIC_BASEURL: string;
+      REDIS_URI: string;
     }
   }
 }

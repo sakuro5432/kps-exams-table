@@ -1,4 +1,4 @@
-import { envServer } from "@/env/server.mjs";
+import "server-only";
 import mongoose from "mongoose";
 
 const MONGODB_URI = process.env.MONGODB_URI;
@@ -25,6 +25,10 @@ if (!global.mongoose) {
 const cached = global.mongoose; // ✅ TS now knows cached is not undefined
 
 async function mongoConnect() {
+  if (mongoose.connection.readyState === 1) {
+    return mongoose.connection;
+  }
+
   if (cached.conn) {
     return cached.conn;
   }
@@ -33,7 +37,7 @@ async function mongoConnect() {
     cached.promise = mongoose
       .connect(MONGODB_URI, {
         dbName:
-          envServer.NODE_ENV === "production" ? "exams" : "exams_development",
+          process.env.NODE_ENV === "production" ? "exams" : "exams_development",
       })
       .then((mongoose) => mongoose);
   }
