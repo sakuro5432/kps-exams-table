@@ -19,8 +19,7 @@ export function SelectView() {
   };
 
   return (
-    <div className="flex items-center gap-5">
-      <h1 className="text-sm"></h1>
+    <div className="flex items-center">
       <Select value={viewMode} onValueChange={handleChange}>
         <SelectTrigger className="max-w-96">
           แสดงผล:

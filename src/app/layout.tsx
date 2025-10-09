@@ -32,7 +32,7 @@ export default function RootLayout({
           <footer className="w-full">
             <div className="bg-primary text-center text-white p-2">
               <a
-                href="https://discord.gg/vfTDdjtr"
+                href="https://discord.gg/VtSzDjZ2K6"
                 className="underline"
                 target="_blank"
               >
