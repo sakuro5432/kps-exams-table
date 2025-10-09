@@ -1,16 +1,26 @@
+// useDesktop.ts
 import { useEffect, useState } from "react";
 import { useMediaQuery } from "usehooks-ts";
 
-export const useDesktop = () => {
-  const isClient = typeof window !== "undefined";
-  const matches = useMediaQuery("(min-width: 768px)");
-  const [isDesktop, setIsDesktop] = useState(false);
+/**
+ * Mobile-first check
+ * Default = true (mobile)
+ * Wait for mount before updating to prevent flicker
+ */
+export const useIsMobile = () => {
+  const matches = useMediaQuery("(max-width: 767px)");
+  const [isMobile, setIsMobile] = useState(true); // ✅ default mobile
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    if (isClient) {
-      setIsDesktop(matches);
-    }
-  }, [matches, isClient]);
+    setMounted(true);
+  }, []);
 
-  return isClient ? isDesktop : false;
+  useEffect(() => {
+    if (mounted) {
+      setIsMobile(matches);
+    }
+  }, [matches, mounted]);
+
+  return { isMobile, mounted };
 };
