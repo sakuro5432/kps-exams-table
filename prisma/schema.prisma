@@ -33,7 +33,7 @@ model User {
   studentTypeCode   String             @db.VarChar(10)
   edulevelCode      String             @db.VarChar(10)
   studentYear       String             @db.VarChar(10)
-  advisorId         String             @db.VarChar(50)
+  advisorId         String?            @db.VarChar(50)
   email             String?            @db.VarChar(100)
   mobileNo          String?            @db.VarChar(15)
   createdAt         DateTime           @default(now()) @db.DateTime(0)
@@ -42,7 +42,7 @@ model User {
   RegisteredCourse  RegisteredCourse[]
   RequestUpdate     RequestUpdate[]
   role              UserRole           @default(STUDENT)
-  Advisor           Advisor            @relation(fields: [advisorId], references: [advisorId])
+  Advisor           Advisor?           @relation(fields: [advisorId], references: [advisorId])
   Major             Major              @relation(fields: [majorCode], references: [majorCode])
   Department        Department         @relation(fields: [departmentCode], references: [departmentCode])
   Faculty           Faculty            @relation(fields: [facultyCode], references: [facultyCode])
