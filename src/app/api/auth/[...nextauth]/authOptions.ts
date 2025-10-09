@@ -114,17 +114,24 @@ export const authOptions: NextAuthOptions = {
             throw refError;
           }
 
-          const existingAdvisor = await prisma.advisor.findUnique({
-            where: { advisorId: student.advisorId },
-          });
-          if (!existingAdvisor) {
-            await prisma.advisor.create({
-              data: {
-                advisorId: student.advisorId,
-                advisorNameTh: student.advisorNameTh.trim(),
-                positionTh: student.positionTh,
-              },
+          const advisorId =
+            !student.advisorId.trim() || student.advisorId.trim() === "-"
+              ? null
+              : student.advisorId;
+
+          if (advisorId) {
+            const existingAdvisor = await prisma.advisor.findUnique({
+              where: { advisorId },
             });
+            if (!existingAdvisor) {
+              await prisma.advisor.create({
+                data: {
+                  advisorId,
+                  advisorNameTh: student.advisorNameTh.trim(),
+                  positionTh: student.positionTh.trim(),
+                },
+              });
+            }
           }
 
           const basicInfo: Omit<
@@ -149,7 +156,7 @@ export const authOptions: NextAuthOptions = {
             studentTypeCode: student.studentTypeCode,
             edulevelCode: student.edulevelCode,
             studentYear: student.studentYear,
-            advisorId: student.advisorId,
+            advisorId,
             email: student.email.trim() || null,
             mobileNo: student.mobileNo.trim() || null,
           };
