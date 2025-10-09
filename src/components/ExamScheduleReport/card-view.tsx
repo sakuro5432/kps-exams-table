@@ -11,7 +11,7 @@ interface Props {
   activeGroup: number | null;
   setActiveGroup: (value: number | null) => void;
 }
-export function ExamCard({ data, activeGroup, setActiveGroup }: Props) {
+export function CardView({ data, activeGroup, setActiveGroup }: Props) {
   return (
     <div
       className={cn(

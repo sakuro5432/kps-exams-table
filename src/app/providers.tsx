@@ -5,6 +5,7 @@ import React from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Logout } from "@/components/LogoutDialog";
+import { Provider as JotaiProvider } from "jotai";
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { refetchOnWindowFocus: false } },
@@ -15,14 +16,16 @@ interface Props {
 }
 export function Providers({ children }: Props) {
   return (
-    <NuqsAdapter>
-      <SessionProvider>
-        <QueryClientProvider client={queryClient}>
-          <Toaster position="top-center" richColors />
-          {children}
-          <Logout />
-        </QueryClientProvider>
-      </SessionProvider>
-    </NuqsAdapter>
+    <JotaiProvider>
+      <NuqsAdapter>
+        <SessionProvider>
+          <QueryClientProvider client={queryClient}>
+            <Toaster position="top-center" richColors />
+            {children}
+            <Logout />
+          </QueryClientProvider>
+        </SessionProvider>
+      </NuqsAdapter>
+    </JotaiProvider>
   );
 }

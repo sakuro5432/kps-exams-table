@@ -1,6 +1,5 @@
 "use client";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+
 import {
   Select,
   SelectContent,
@@ -8,38 +7,30 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ViewMode } from "@/constant";
+import { useAtom } from "jotai";
+import { viewModeAtom, ViewMode } from "@/atoms/viewModeAtom";
 
-const COOKIE_KEY = "viewMode";
-
-export function SelectView({
-  defaultValue,
-}: {
-  defaultValue: keyof typeof ViewMode;
-}) {
-  const router = useRouter();
-  const [view, setView] = useState(defaultValue);
-
-  // Update when defaultValue changes
-  useEffect(() => {
-    setView(defaultValue);
-  }, [defaultValue]);
+export function SelectView() {
+  const [viewMode, setViewMode] = useAtom(viewModeAtom);
 
   const handleChange = (value: string) => {
-    const upper = value.toUpperCase() as keyof typeof ViewMode;
-    setView(upper);
-    document.cookie = `${COOKIE_KEY}=${upper}; path=/; max-age=31536000`;
-    router.refresh(); // 🔥 tells Next.js to re-render with new cookie
+    const upper = value.toUpperCase() as ViewMode;
+    setViewMode(upper);
   };
+
   return (
-    <Select value={view} onValueChange={handleChange}>
-      <SelectTrigger className="max-w-96">
-        <SelectValue placeholder="Display mode" />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectItem value="TABLE">ตาราง</SelectItem>
-        <SelectItem value="CARD">การ์ด</SelectItem>
-      </SelectContent>
-    </Select>
+    <div className="flex items-center gap-5">
+      <h1 className="text-sm"></h1>
+      <Select value={viewMode} onValueChange={handleChange}>
+        <SelectTrigger className="max-w-96">
+          แสดงผล:
+          <SelectValue placeholder="โหมดการแสดงผล" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="TABLE">ตาราง</SelectItem>
+          <SelectItem value="CARD">การ์ด</SelectItem>
+        </SelectContent>
+      </Select>
+    </div>
   );
 }

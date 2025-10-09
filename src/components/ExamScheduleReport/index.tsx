@@ -7,7 +7,7 @@ import React, { useRef, useState } from "react";
 // import dynamic from "next/dynamic";
 import { DownloadScreenshotButton } from "../DownloadScreenshotButton";
 import { envClient } from "@/env/client";
-import { ExamCard } from "./exam-card";
+import { CardView } from "./card-view";
 import { buttonVariants } from "../ui/button";
 import Link from "next/link";
 // import { Skeleton } from "../ui/skeleton";
@@ -19,6 +19,8 @@ import { SelectView } from "./SelectView";
 import { ViewMode } from "@/constant";
 import { TableView } from "./table-view";
 import { useIsMobile } from "../useDesktop";
+import { useAtomValue } from "jotai";
+import { viewModeAtom } from "@/atoms/viewModeAtom";
 // const RequestUpdateButton = dynamic(
 //   () => import("../RequestUpdateButton").then((x) => x.RequestUpdateButton),
 //   {
@@ -36,13 +38,13 @@ interface Props {
     studentStatusNameTh: string;
   };
   data: ExamScheduleDataType[];
-  viewMode: keyof typeof ViewMode;
   // isRequestable: { disabled: boolean; message: string };
 }
-export function ExamScheduleReport({ metadata, data, viewMode }: Props) {
+export function ExamScheduleReport({ metadata, data }: Props) {
   const contentRef = useRef<HTMLDivElement | null>(null);
   const [activeGroup, setActiveGroup] = useState<number | null>(null);
   const { isMobile, mounted } = useIsMobile();
+  const viewMode = useAtomValue(viewModeAtom);
   return (
     <div ref={contentRef} className="data-container space-y-5">
       <div className="flex justify-between">
@@ -67,7 +69,7 @@ export function ExamScheduleReport({ metadata, data, viewMode }: Props) {
       {mounted && (
         <>
           <div className="print:hidden export-hidden w-full flex flex-col xl:flex-row xl:justify-end gap-2">
-            <SelectView defaultValue={viewMode} />
+            <SelectView />
             <div className="flex w-full gap-2 xl:w-auto">
               {/* <div className="w-1/2 xl:w-auto">
             <RequestUpdateButton isRequestable={isRequestable} />
@@ -105,7 +107,7 @@ export function ExamScheduleReport({ metadata, data, viewMode }: Props) {
                     <div className="md:grid xl:grid grid-cols-2 gap-1 print:grid print:break-inside-avoid">
                       {exams.map((x) => (
                         <div key={x.id}>
-                          <ExamCard
+                          <CardView
                             key={x.id}
                             data={x}
                             activeGroup={activeGroup}
