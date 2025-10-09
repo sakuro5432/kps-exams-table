@@ -12,7 +12,7 @@ import { BadgeSectionCode } from "@/components/BadgeSectionCode";
 import { cn } from "@/lib/utils";
 import { sectionTypeTranslator } from "@/utils/section";
 import dynamic from "next/dynamic";
-import { useDesktop } from "@/components/useDesktop";
+import { useIsMobile } from "@/components/useDesktop";
 import {
   Sheet,
   SheetContent,
@@ -35,12 +35,8 @@ interface Props {
 }
 export function ExamDataEditor({ data }: Props) {
   const [open, setOpen] = useState(false); // for sheet
-  const [mounted, setMounted] = useState(false);
-  const isDesktop = useDesktop();
+  const { isMobile, mounted } = useIsMobile();
   const [selected, setSelected] = useState<UserExamPlannerData | null>(null);
-  useEffect(() => {
-    setMounted(true);
-  }, []);
   const onDelete = async (id: string) => {
     const v = confirm("คุณต้องการรีเซ็ตข้อมูลนี้?");
     if (v) {
@@ -56,12 +52,12 @@ export function ExamDataEditor({ data }: Props) {
     <div className="grid xl:grid-cols-2 gap-5 xl:gap-0">
       <div className="space-y-1 max-h-[70vh] overflow-y-scroll max-w-md">
         {mounted &&
-          isDesktop &&
+          !isMobile &&
           data.map((x) =>
             renderListingCard(x, selected, setSelected, undefined, onDelete)
           )}
       </div>
-      {mounted && !isDesktop && (
+      {mounted && isMobile && (
         <ExamDataSheet
           data={data}
           selected={selected}

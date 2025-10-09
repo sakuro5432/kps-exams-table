@@ -120,3 +120,9 @@
     @apply bg-background text-foreground;
   }
 }
+@media (max-width: 768px) {
+  .data-container {
+    overflow: visible !important;
+    width: 100% !important;
+  }
+}

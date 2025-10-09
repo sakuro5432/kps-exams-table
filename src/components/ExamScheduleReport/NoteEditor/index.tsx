@@ -1,6 +1,6 @@
 "use client";
 
-import { useDesktop } from "@/components/useDesktop";
+import { useIsMobile } from "@/components/useDesktop";
 import { Desktop } from "./desktop";
 import { Mobile } from "./mobile";
 import { Props } from "./types";
@@ -36,7 +36,7 @@ export default function NoteEditor({
     [data.note]
   );
 
-  const isDesktop = useDesktop();
+  const { isMobile } = useIsMobile();
 
   const form = useForm({
     resolver: zodResolver(schema),
@@ -71,9 +71,9 @@ export default function NoteEditor({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formState]);
 
-  if (isDesktop)
+  if (isMobile)
     return (
-      <Desktop
+      <Mobile
         data={data}
         form={form}
         onSubmit={onSubmit}
@@ -84,7 +84,7 @@ export default function NoteEditor({
       />
     );
   return (
-    <Mobile
+    <Desktop
       data={data}
       form={form}
       onSubmit={onSubmit}
