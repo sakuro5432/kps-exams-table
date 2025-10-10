@@ -20,7 +20,6 @@ export async function Auth() {
     session.user.sessionId
   );
   if (!isValidSession) {
-    console.log(session.user.id, session.user.sessionId);
     return null;
   }
   return { session: session.user };
