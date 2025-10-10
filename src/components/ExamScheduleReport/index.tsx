@@ -86,65 +86,80 @@ export function ExamScheduleReport({ metadata, data }: Props) {
               <DownloadScreenshotButton contentRef={contentRef} />
             </div>
           </div>
-          <div className={"space-y-5"}>
-            {viewMode === "TABLE" ? (
-              <TableView
-                data={groupByDate(data)}
-                activeGroup={activeGroup}
-                setActiveGroup={setActiveGroup}
-                isMobile={isMobile}
-              />
-            ) : (
-              <div className="space-y-3">
-                {groupByDate(data).map(({ date, exams }) => (
-                  <div
-                    key={date.toString()}
-                    className="print:break-inside-avoid"
-                  >
-                    <h2 className="text-lg font-semibold mb-2">
-                      {formatThaiDate(date)}
-                    </h2>
-                    <div className="md:grid xl:grid grid-cols-2 gap-1 print:grid print:break-inside-avoid">
-                      {exams.map((x) => (
-                        <div key={x.id}>
-                          <CardView
-                            key={x.id}
-                            data={x}
-                            activeGroup={activeGroup}
-                            setActiveGroup={setActiveGroup}
-                          />
-                        </div>
-                      ))}
+          {data.length === 0 && (
+            <div className="text-center space-y-1">
+              <p className="text-xl font-medium">
+                ไม่พบรายวิชาที่มีต้องสอบในขณะนี้
+              </p>
+              <p className="text-destructive">
+                หากสาขาของคุณมีการจัดสอบ
+                <br />
+                สามารถจัดตารางสอบได้ด้วยตนเองที่ปุ่ม{" "}
+                <span className="font-semibold">“จัดตารางสอบ”</span>
+              </p>
+            </div>
+          )}
+          {data.length > 0 && (
+            <div className={"space-y-5"}>
+              {viewMode === "TABLE" ? (
+                <TableView
+                  data={groupByDate(data)}
+                  activeGroup={activeGroup}
+                  setActiveGroup={setActiveGroup}
+                  isMobile={isMobile}
+                />
+              ) : (
+                <div className="space-y-3">
+                  {groupByDate(data).map(({ date, exams }) => (
+                    <div
+                      key={date.toString()}
+                      className="print:break-inside-avoid"
+                    >
+                      <h2 className="text-lg font-semibold mb-2">
+                        {formatThaiDate(date)}
+                      </h2>
+                      <div className="md:grid xl:grid grid-cols-2 gap-1 print:grid print:break-inside-avoid">
+                        {exams.map((x) => (
+                          <div key={x.id}>
+                            <CardView
+                              key={x.id}
+                              data={x}
+                              activeGroup={activeGroup}
+                              setActiveGroup={setActiveGroup}
+                            />
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+              )}
+              <div className="md:flex xl:flex items-center justify-between md:space-y-0 xl:space-y-0 space-y-1">
+                <p className="font-medium text-destructive">
+                  คำเตือน :
+                  แนะนำให้ตรวจสอบตารางสอบด้วยตนเองอีกครั้งเพื่อความถูกต้อง!{" "}
+                </p>
+                <p
+                  className="text-xs font-medium end-credit"
+                  style={{ display: "none" }}
+                >
+                  Reported by : {envClient.BASEURL}
+                </p>
               </div>
-            )}
-            <div className="md:flex xl:flex items-center justify-between md:space-y-0 xl:space-y-0 space-y-1">
-              <p className="font-medium text-destructive">
-                คำเตือน :
-                แนะนำให้ตรวจสอบตารางสอบด้วยตนเองอีกครั้งเพื่อความถูกต้อง!{" "}
-              </p>
-              <p
-                className="text-xs font-medium end-credit"
-                style={{ display: "none" }}
-              >
-                Reported by : {envClient.BASEURL}
-              </p>
+              <div className="export-hidden">
+                <Link
+                  href={
+                    "https://ead.kps.ku.ac.th/2025/index.php/nisit-m/exam-menu/5-first-exam/73-prakas-mk-kphs-reuxng-tarang-sxbli-praca-phakh-tn-pi-kar-suksa-2568-lng-wan-thi-22-kanyayn-2568?tmpl=component"
+                  }
+                  target="_blank"
+                  className="underline"
+                >
+                  ตารางกลาง
+                </Link>
+                ,
+              </div>
             </div>
-            <div className="export-hidden">
-              <Link
-                href={
-                  "https://ead.kps.ku.ac.th/2025/index.php/nisit-m/exam-menu/5-first-exam/73-prakas-mk-kphs-reuxng-tarang-sxbli-praca-phakh-tn-pi-kar-suksa-2568-lng-wan-thi-22-kanyayn-2568?tmpl=component"
-                }
-                target="_blank"
-                className="underline"
-              >
-                ตารางกลาง
-              </Link>
-              ,
-            </div>
-          </div>
+          )}
         </>
       )}
     </div>
