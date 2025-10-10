@@ -83,7 +83,7 @@ export function TableView({
                       )}:${String(exam.timeTo % 60).padStart(2, "0")}`}
                     </span>
                     <span className="text-right">
-                      🏫 {exam.room || "ไม่ระบุ"}
+                      ห้องสอบ: {exam.room || "ไม่ระบุ"}
                     </span>
                     <span>หมู่ {exam.sectionCode}</span>
                   </div>
