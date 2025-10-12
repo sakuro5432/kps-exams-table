@@ -34,8 +34,8 @@ model User {
   edulevelCode      String             @db.VarChar(10)
   studentYear       String             @db.VarChar(10)
   advisorId         String?            @db.VarChar(50)
-  email             String?            @db.VarChar(100)
-  mobileNo          String?            @db.VarChar(15)
+  // email             String?            @db.VarChar(100)
+  // mobileNo          String?            @db.VarChar(15)
   createdAt         DateTime           @default(now()) @db.DateTime(0)
   requestUpdateAt   DateTime?          @db.DateTime(0)
   UserExamSchedule  UserExamSchedule[]

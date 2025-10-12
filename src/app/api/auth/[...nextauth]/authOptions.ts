@@ -12,7 +12,6 @@ import { revalidateMyCourse } from "@/controllers/revalidateMyCourse.controller"
 import { User as UserTable } from "@/lib/generated/prisma";
 import { referenceProcess, ReferenceType } from "./referenceName";
 import { signInSchema } from "@/zod/auth";
-import { envServer } from "@/env/server.mjs";
 import LogModel, { LogAction, LoginDetail } from "@/mongoose/model/Log";
 import mongoConnect from "@/mongoose/connect";
 import { createSession, revokeSession, validateSession } from "@/lib/session";
@@ -157,8 +156,6 @@ export const authOptions: NextAuthOptions = {
             edulevelCode: student.edulevelCode,
             studentYear: student.studentYear,
             advisorId,
-            email: student.email.trim() || null,
-            mobileNo: student.mobileNo.trim() || null,
           };
           if (!findUser) {
             await prisma.user.create({
