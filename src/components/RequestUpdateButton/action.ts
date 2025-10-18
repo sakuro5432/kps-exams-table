@@ -25,11 +25,7 @@ export async function action() {
       orderBy: { createdAt: "desc" },
     });
 
-    if (
-      envServer.NODE_ENV === "production" &&
-      lastRequest &&
-      lastRequest.createdAt
-    ) {
+    if (lastRequest && lastRequest.createdAt) {
       const now = Date.now();
       const lastTime = new Date(lastRequest.createdAt).getTime();
 

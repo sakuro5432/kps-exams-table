@@ -84,15 +84,13 @@ export async function update(
         });
       }
 
-      if (envServer.NODE_ENV === "production") {
-        const cache = await UserExamModel.findOne({ stdCode });
-        if (cache) {
-          const s = cache.exams.findIndex((x) => x.id === userExamId);
-          if (s !== -1) {
-            cache.exams[s].note = note || null;
-            cache.markModified("exams");
-            await cache.save();
-          }
+      const cache = await UserExamModel.findOne({ stdCode });
+      if (cache) {
+        const s = cache.exams.findIndex((x) => x.id === userExamId);
+        if (s !== -1) {
+          cache.exams[s].note = note || null;
+          cache.markModified("exams");
+          await cache.save();
         }
       }
       await LogModel.create({

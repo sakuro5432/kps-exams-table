@@ -8,7 +8,9 @@ import { envServer } from "@/env/server.mjs";
 interface Props {
   stdCode: string;
 }
-async function getPlannerData({ stdCode }: Props): Promise<UserExamPlannerData[]> {
+async function getPlannerData({
+  stdCode,
+}: Props): Promise<UserExamPlannerData[]> {
   const exceptIDs = await prisma.userExamSchedule.findMany({
     where: {
       stdCode,
@@ -76,19 +78,15 @@ async function getPlannerData({ stdCode }: Props): Promise<UserExamPlannerData[]
   return result;
 }
 export async function getUserExamPlanner(stdCode: string) {
-  if (envServer.NODE_ENV === "production") {
-    const cached = await UserExamPlannerModel.findOne({ stdCode }).lean();
-    if (cached) {
-      return cached.exams.map((x) => ({
-        ...x,
-        sectionType: x.sectionType as $Enums.SectionType,
-      }));
-    }
+  const cached = await UserExamPlannerModel.findOne({ stdCode }).lean();
+  if (cached) {
+    return cached.exams.map((x) => ({
+      ...x,
+      sectionType: x.sectionType as $Enums.SectionType,
+    }));
   }
   // fallback ไป query จาก SQL + สร้าง cache
   const exams = await getPlannerData({ stdCode });
-  if (envServer.NODE_ENV === "production") {
-    await UserExamPlannerModel.create({ stdCode, exams });
-  }
+  await UserExamPlannerModel.create({ stdCode, exams });
   return exams;
 }

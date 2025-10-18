@@ -42,6 +42,8 @@ export async function resetUpdate(id: string): Promise<ResponseData> {
         where: {
           stdCode,
           subjectCode: { startsWith: validCourse.CourseSchedule.subjectCode },
+          sectionCode: validCourse.CourseSchedule.sectionCode,
+          sectionType: validCourse.CourseSchedule.sectionType,
           deletedAt: null,
           reportBy: "STUDENT",
         },
@@ -78,20 +80,18 @@ export async function resetUpdate(id: string): Promise<ResponseData> {
         });
       }
 
-      if (envServer.NODE_ENV === "production") {
-        const userExamModelCache = await UserExamModel.findOne({ stdCode });
-        if (userExamModelCache) {
-          const s = userExamModelCache.exams.findIndex(
-            (x) => x.id === userExamId.id
-          );
-          if (s !== -1) {
-            userExamModelCache.exams.splice(s, 1); // ลบออกจาก array
-            userExamModelCache.markModified("exams");
-            await userExamModelCache.save();
-          }
+      const userExamModelCache = await UserExamModel.findOne({ stdCode });
+      if (userExamModelCache) {
+        const s = userExamModelCache.exams.findIndex(
+          (x) => x.id === userExamId.id
+        );
+        if (s !== -1) {
+          userExamModelCache.exams.splice(s, 1); // ลบออกจาก array
+          userExamModelCache.markModified("exams");
+          await userExamModelCache.save();
         }
-        await UserExamPlannerModel.findOneAndDelete({ stdCode });
       }
+      await UserExamPlannerModel.findOneAndDelete({ stdCode });
 
       await LogModel.create({
         stdCode,

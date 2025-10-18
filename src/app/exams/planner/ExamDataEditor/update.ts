@@ -98,11 +98,9 @@ export async function update(payload: string): Promise<ResponseData> {
       updated = { type: "CREATE_EXAM", data: insertExamSchedule };
     }
 
-    if (envServer.NODE_ENV === "production") {
-      // Update MongoDB cache
-      await UserExamModel.findOneAndDelete({ stdCode });
-      await UserExamPlannerModel.findOneAndDelete({ stdCode });
-    }
+    // Update MongoDB cache
+    await UserExamModel.findOneAndDelete({ stdCode });
+    await UserExamPlannerModel.findOneAndDelete({ stdCode });
 
     if (updated) {
       await LogModel.create({
