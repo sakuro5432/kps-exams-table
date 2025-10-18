@@ -1,15 +1,16 @@
 {
   "name": "kps-exams-table",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "prisma": {
     "seed": "tsx prisma/seed.ts"
   },
   "scripts": {
+    "patches": "tsx src/patches/index.ts",
     "migrate": "prisma migrate deploy",
     "testEnv": "node src/env/server.mjs",
     "dev": "cross-env NODE_ENV=development prisma db seed && next dev --turbopack",
-    "prebuild": "cross-env NODE_ENV=production npm run testEnv && next telemetry disable && npm run migrate && prisma generate && cross-env NODE_ENV=production prisma db seed",
+    "prebuild": "npm run migrate && npm run patches && prisma generate",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"

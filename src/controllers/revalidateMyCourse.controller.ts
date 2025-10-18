@@ -91,9 +91,10 @@ export async function revalidateMyCourse(stdCode: string, token: string) {
             startsWith: code.subjectCodes,
           },
           sectionType: code.sectionType,
-          sectionCode: { contains: code.sectionCode },
+          sectionCode: code.sectionCode,
           deletedAt: null,
         })),
+        AND: [{ OR: [{ stdCode }, { stdCode: null }] }], // filter only self stdCode or null not other stdCode
       },
     });
 
