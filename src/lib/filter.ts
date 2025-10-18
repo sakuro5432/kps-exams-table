@@ -44,7 +44,10 @@ function groupOverlaps(
   exams: ExamScheduleDataType[],
   startCounter: number
 ): {
-  marked: (ExamScheduleDataType & { isOverlap: boolean; groupId: number | null })[];
+  marked: (ExamScheduleDataType & {
+    isOverlap: boolean;
+    groupId: number | null;
+  })[];
   nextCounter: number;
 } {
   const marked = exams.map((e) => ({
@@ -58,12 +61,14 @@ function groupOverlaps(
   for (let i = 0; i < marked.length; i++) {
     const a = marked[i];
     if (a.groupId !== null) continue;
-    if (typeof a.timeFrom !== "number" || typeof a.timeTo !== "number") continue;
+    if (typeof a.timeFrom !== "number" || typeof a.timeTo !== "number")
+      continue;
 
     const groupMembers = [a];
     for (let j = i + 1; j < marked.length; j++) {
       const b = marked[j];
-      if (typeof b.timeFrom !== "number" || typeof b.timeTo !== "number") continue;
+      if (typeof b.timeFrom !== "number" || typeof b.timeTo !== "number")
+        continue;
 
       const overlap = a.timeFrom < b.timeTo && b.timeFrom < a.timeTo;
       if (overlap) groupMembers.push(b);
@@ -80,7 +85,6 @@ function groupOverlaps(
 
   return { marked, nextCounter: groupCounter };
 }
-
 
 export function filterExamScheduleByStudent(
   examSchedules: ExamSchedule[],
