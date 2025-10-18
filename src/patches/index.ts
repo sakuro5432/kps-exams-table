@@ -1,9 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { prisma } from "@/lib/db";
-import { PatchStatus } from "@/lib/generated/prisma";
 import { version } from "../../package.json";
-
 // ตรวจสอบว่าเป็น patch ไฟล์จริง
 const isPatchFile = (file: string) =>
   file.endsWith(".ts") && !file.endsWith("index.ts") && !file.startsWith("_");
@@ -77,7 +75,7 @@ async function main() {
           data: {
             patchName: meta.name || fileName,
             version,
-            status: PatchStatus.SUCCESS,
+            status: "SUCCESS",
             durationMs: duration,
           },
         });
@@ -99,7 +97,7 @@ async function main() {
         data: {
           patchName: fileName,
           version,
-          status: PatchStatus.FAILED,
+          status: "FAILED",
           message,
           durationMs: duration,
         },
