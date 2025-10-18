@@ -10,7 +10,7 @@
     "migrate": "prisma migrate deploy",
     "testEnv": "node src/env/server.mjs",
     "dev": "cross-env NODE_ENV=development prisma db seed && next dev --turbopack",
-    "prebuild": "npm run migrate && npm run patches && prisma generate",
+    "prebuild": "npm run migrate && prisma generate && npm run patches",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
