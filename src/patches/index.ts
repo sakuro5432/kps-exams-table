@@ -1,5 +1,7 @@
 import fs from "fs";
 import path from "path";
+import { prisma } from "@/lib/db";
+import { PatchStatus } from "@/lib/generated/prisma";
 import { version } from "../../package.json";
 
 // ตรวจสอบว่าเป็น patch ไฟล์จริง
@@ -33,8 +35,9 @@ async function main() {
 
   for (const file of patchFiles) {
     index++;
-    const prefix = `[${today}/${index}]`; // ← วันที่ + ลำดับ
+    const prefix = `[${today}/${index}]`;
     const fileName = path.basename(file);
+    let start = 0; // ✅ ต้องประกาศข้างนอก try เพื่อใช้ใน catch ได้
 
     try {
       const mod = await import(file);
@@ -52,20 +55,55 @@ async function main() {
 
       console.log(`${prefix} ▶️  Running ${meta.name || fileName}`);
 
+      start = performance.now(); // ✅ เริ่มจับเวลา
+
       if (typeof fn === "function") {
-        // ใส่ prefix ให้ log ภายใน patch
+        // ให้ prefix กับ log ภายใน patch
         const originalLog = console.log;
         console.log = (...args) => originalLog(prefix, ...args);
 
         await fn();
 
         console.log = originalLog; // คืนค่า log เดิม
-        console.log(`${prefix} ✅ Done ${meta.name || fileName}\n`);
+
+        const end = performance.now();
+        const duration = Math.round(end - start);
+
+        console.log(
+          `${prefix} ✅ Done ${meta.name || fileName} (${duration} ms)\n`
+        );
+
+        await prisma.patchLog.create({
+          data: {
+            patchName: meta.name || fileName,
+            version,
+            status: PatchStatus.SUCCESS,
+            durationMs: duration,
+          },
+        });
       } else {
         console.log(`${prefix} ⚠️ Skip ${fileName} (no default export)\n`);
       }
     } catch (err) {
+      const end = performance.now();
+      const duration = Math.round(end - start);
+
       console.error(`${prefix} ❌ Failed ${file}:`, err, "\n");
+
+      let message = "Unknown error";
+      if (err instanceof Error) {
+        message = err.message;
+      }
+
+      await prisma.patchLog.create({
+        data: {
+          patchName: fileName,
+          version,
+          status: PatchStatus.FAILED,
+          message,
+          durationMs: duration,
+        },
+      });
     }
   }
 

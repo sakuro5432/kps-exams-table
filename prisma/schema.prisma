@@ -252,3 +252,18 @@ model RequestUpdate {
   User      User     @relation(fields: [stdCode], references: [stdCode])
   createdAt DateTime @default(now()) @db.DateTime(0)
 }
+
+enum PatchStatus {
+  SUCCESS
+  FAILED
+}
+
+model PatchLog {
+  id         String      @id @default(cuid())
+  patchName  String
+  version    String      @db.VarChar(10)
+  status     PatchStatus
+  message    String? // optional: error message หรือ note เพิ่มเติม
+  durationMs Int? // เวลาในการรัน patch (มิลลิวินาที)
+  executedAt DateTime    @default(now())
+}
