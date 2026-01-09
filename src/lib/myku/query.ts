@@ -6,6 +6,7 @@ import {
   GetMyCourseResponseInterface,
   GetOpenSubjectResponseInterface,
 } from "./types";
+import { targetSemester, targetYearTh } from "@/constant";
 
 export class MyKuQueryInstance {
   private token: string;
@@ -15,7 +16,7 @@ export class MyKuQueryInstance {
   getMyCourse(stdId: string) {
     if (!stdId) throw new Error("stdId is required!");
     return axios.get<GetMyCourseResponseInterface>(
-      `https://my.ku.th/myku/api/std-profile/getGroupCourse?academicYear=2568&semester=1&stdId=${stdId}`,
+      `https://my.ku.th/myku/api/std-profile/getGroupCourse?academicYear=${targetYearTh}&semester=${targetSemester}&stdId=${stdId}`,
       {
         headers: headers(this.token),
       }
@@ -31,7 +32,7 @@ export class MyKuQueryInstance {
   getCourseMetadata(subjectCode: string) {
     if (!subjectCode) throw new Error("subjectCode is required!");
     return axios.get<GetOpenSubjectResponseInterface>(
-      `https://my.ku.th/myku/api/enroll/openSubjectForEnroll?query=${subjectCode}&academicYear=2568&semester=1&campusCode=K&section=`,
+      `https://my.ku.th/myku/api/enroll/openSubjectForEnroll?query=${subjectCode}&academicYear=${targetYearTh}&semester=${targetSemester}&campusCode=K&section=`,
       { headers: headers(this.token) }
     );
   }

@@ -22,7 +22,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { resetUpdate } from "./reset";
-import { toast } from "sonner";
+import { toast } from "react-hot-toast";
 import { UserExamPlannerData } from "@/types/userExamPlanner.types";
 import { formatThaiDate, formatTimeRange } from "@/utils/date";
 import { envClient } from "@/env/client";

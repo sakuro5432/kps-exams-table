@@ -149,7 +149,7 @@ export function ExamScheduleReport({ metadata, data }: Props) {
               <div className="export-hidden">
                 <Link
                   href={
-                    "https://ead.kps.ku.ac.th/2025/index.php/nisit-m/exam-menu/5-first-exam/73-prakas-mk-kphs-reuxng-tarang-sxbli-praca-phakh-tn-pi-kar-suksa-2568-lng-wan-thi-22-kanyayn-2568?tmpl=component"
+                    "https://ead.kps.ku.ac.th/2025/index.php/nisit-m/exam-menu/6-sec-exam/113-2568?tmpl=component"
                   }
                   target="_blank"
                   className="underline"

@@ -29,6 +29,7 @@ interface Props<T, K> {
   schema?: Schema<T>;
   disabledNavigation?: boolean;
   targetMonth: number; // 1 = Jan, 2 = Feb, ... 12 = Dec
+  targetYear: number;
 }
 export default function FormCalendar<T, K extends keyof T>({
   control,
@@ -36,10 +37,11 @@ export default function FormCalendar<T, K extends keyof T>({
   label,
   disabledNavigation = false,
   targetMonth,
+  targetYear,
 }: Props<T, K>) {
   const [open, setOpen] = useState(false);
   const onOpenChange = () => setOpen(!open);
-  const defaultMonth = new Date(2025, targetMonth - 1);
+  const defaultMonth = new Date(targetYear, targetMonth - 1);
   return (
     <FormField
       control={control}
@@ -91,7 +93,7 @@ export default function FormCalendar<T, K extends keyof T>({
 
                   return (
                     date.getMonth() !== targetMonth - 1 ||
-                    date.getFullYear() !== 2025
+                    date.getFullYear() !== targetYear
                   );
                 }}
               />

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { schema } from "./schema";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { update } from "./update";
-import { toast } from "sonner";
+import { toast } from "react-hot-toast";
 import { Form } from "@/components/ui/form";
 import FormInput from "@/components/FormInput";
 import {
@@ -24,6 +24,7 @@ import lodash from "lodash";
 import { sectionTypeTranslator } from "@/utils/section";
 import { minutesRangeToTimeStrings } from "@/utils/date";
 import { UserExamPlannerData } from "@/types/userExamPlanner.types";
+import { targetMonth, targetYearEn } from "@/constant";
 type FormValue = z.infer<typeof schema>;
 
 interface Props {
@@ -135,7 +136,8 @@ export function FormEditor({ data, setSelected }: Props) {
                 schema={schema}
                 name={"date"}
                 label="เลือกวันสอบ"
-                targetMonth={10}
+                targetMonth={targetMonth}
+                targetYear={targetYearEn}
                 disabledNavigation
               />
               <FormTimeRangeInput

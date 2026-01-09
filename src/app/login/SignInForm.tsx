@@ -22,7 +22,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import { toast } from "react-hot-toast";
 import { signInSchema, z } from "@/zod/auth";
 
 let signIn: typeof import("next-auth/react").signIn;
@@ -59,9 +59,7 @@ export function SignInForm() {
         if (s.error) {
           toast.error(s.error);
         } else {
-          toast.error("เกิดข้อผิดพลาดไม่ทราบสาเหตุ (Login)", {
-            description: "โปรดแจ้งเรา",
-          });
+          toast.error("เกิดข้อผิดพลาดไม่ทราบสาเหตุ (Login)");
         }
       }
     }

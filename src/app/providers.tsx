@@ -1,11 +1,11 @@
 "use client";
-import { Toaster } from "@/components/ui/sonner";
 import { SessionProvider } from "next-auth/react";
 import React from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Logout } from "@/components/LogoutDialog";
 import { Provider as JotaiProvider } from "jotai";
+import { Toaster } from "react-hot-toast";
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { refetchOnWindowFocus: false } },
@@ -20,7 +20,7 @@ export function Providers({ children }: Props) {
       <NuqsAdapter>
         <SessionProvider>
           <QueryClientProvider client={queryClient}>
-            <Toaster position="top-center" richColors />
+            <Toaster position="top-center" />
             {children}
             <Logout />
           </QueryClientProvider>

@@ -4,8 +4,7 @@ import { app } from "@/lib/myku";
 import { prisma } from "@/lib/db";
 import { CourseSchedule } from "@/lib/generated/prisma";
 import { timeStringToMinutes, toDayW } from "@/utils/date";
-
-const targetPeriod = "23/06/2568-19/10/2568";
+import { targetPeriod } from "@/constant";
 
 type CourseScheduleWithoutTimestamps = Omit<
   CourseSchedule,

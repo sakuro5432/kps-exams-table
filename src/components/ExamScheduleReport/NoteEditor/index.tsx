@@ -15,7 +15,7 @@ import {
   useState,
 } from "react";
 import { update } from "./update";
-import { toast } from "sonner";
+import { toast } from "react-hot-toast";
 
 export default function NoteEditor({
   data,
@@ -64,7 +64,7 @@ export default function NoteEditor({
         // รีเซ็ต form ด้วยค่าปัจจุบัน (note ที่เพิ่งอัปเดต)
         form.reset({ userExamId: data.id, note: data.note || "" });
       } else {
-        toast.error(formState.message, { description: "โปรดลองใหม่อีกครั้ง" });
+        toast.error(formState.message);
       }
     }
     setOpen(false);

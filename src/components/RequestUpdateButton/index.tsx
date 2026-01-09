@@ -2,7 +2,7 @@ import { LucideClockFading } from "lucide-react";
 import { Button } from "../ui/button";
 import { useState } from "react";
 import { action } from "@/components/RequestUpdateButton/action";
-import { toast } from "sonner";
+import { toast } from "react-hot-toast";
 import { envClient } from "@/env/client";
 
 interface Props {
