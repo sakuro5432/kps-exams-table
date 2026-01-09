@@ -30,7 +30,7 @@ async function seed() {
   await resetCache();
 
   const filePath = path.resolve(
-    "prisma/data/2025_first_semester/final/base.csv"
+    "prisma/data/2025_second_semester/mid/base.csv"
   );
   console.log("🌱 Reading CSV:", filePath);
   // Read CSV file
