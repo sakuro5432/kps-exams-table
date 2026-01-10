@@ -33,17 +33,17 @@ export async function getMyCourse(
       !Array.isArray(res.data.results) ||
       res.data.results.length === 0
     ) {
-      throw new Error("No course data available to save.");
+      throw new Error("ไม่พบตารางเรียน");
     }
     const data = res.data.results.filter((c) =>
       c.peroid_date.includes(targetPeriod)
     );
     if (data.length === 0) {
-      throw new Error(`❌ ไม่พบตารางเรียน ${targetPeriod}`);
+      throw new Error(`ไม่พบตารางเรียนช่วง ${targetPeriod}`);
     }
 
     if (!data[0].course || data[0].course.length === 0) {
-      throw new Error(`⚠️ พบตารางเรียน ${targetPeriod}, แต่ข้อมูลไม่สมบูรณ์`);
+      throw new Error(`พบตารางเรียน ${targetPeriod}, แต่ข้อมูลไม่สมบูรณ์`);
     }
     return data[0].course.map((course) => ({
       sectionId: course.section_id, // Ensure this is unique
