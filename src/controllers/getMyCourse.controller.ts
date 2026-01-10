@@ -39,15 +39,11 @@ export async function getMyCourse(
       c.peroid_date.includes(targetPeriod)
     );
     if (data.length === 0) {
-      throw new Error(
-        `❌ No term data found for period ${targetPeriod} in API results.`
-      );
+      throw new Error(`❌ ไม่พบตารางเรียน ${targetPeriod}`);
     }
 
     if (!data[0].course || data[0].course.length === 0) {
-      throw new Error(
-        `⚠️ Term ${targetPeriod} found, but it contains no course information.`
-      );
+      throw new Error(`⚠️ พบตารางเรียน ${targetPeriod}, แต่ข้อมูลไม่สมบูรณ์`);
     }
     return data[0].course.map((course) => ({
       sectionId: course.section_id, // Ensure this is unique
