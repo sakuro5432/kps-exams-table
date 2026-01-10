@@ -13,7 +13,7 @@ export async function revalidateMyCourse(stdCode: string, token: string) {
     let myCourse = await getMyCourse(stdCode, token);
 
     if (!myCourse || myCourse.length === 0) {
-      throw new Error("No course data available to save.");
+      throw new Error("ไม่พบตารางเรียน [revalidate-1]");
     }
     // กรองข้อมูลซ้ำ
     myCourse = uniqueBy(myCourse, (x) => x.sectionId);
@@ -76,7 +76,7 @@ export async function revalidateMyCourse(stdCode: string, token: string) {
     // STEP 2: ดึงข้อมูลใหม่อีกครั้ง (อาจลบ step นี้หากไม่จำเป็น)
     myCourse = await getMyCourse(stdCode, token);
     if (!myCourse || myCourse.length === 0) {
-      throw new Error("No course data available to save.");
+      throw new Error("ไม่พบตารางเรียน [revalidate-2]");
     }
 
     // กรองข้อมูลซ้ำ
@@ -124,6 +124,6 @@ export async function revalidateMyCourse(stdCode: string, token: string) {
     }
   } catch (error) {
     console.error("Detailed error in collectAndSaveMyCourse:", error);
-    throw new Error("Error collecting and saving courses");
+    throw new Error("เกิดข้อผิดพลาดระหว่างรวบรวมข้อมูล");
   }
 }
