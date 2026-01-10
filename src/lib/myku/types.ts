@@ -35,3 +35,8 @@ export interface GetOpenSubjectResponseInterface {
 }
 
 export interface GetStudentEnrollSubject extends EnrollData {}
+
+export interface RefreshCourseDataInterface {
+  code: "success" | "expired" | string;
+  message: string;
+}

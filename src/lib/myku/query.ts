@@ -5,6 +5,7 @@ import {
   GetStudentEnrollSubject,
   GetMyCourseResponseInterface,
   GetOpenSubjectResponseInterface,
+  RefreshCourseDataInterface,
 } from "./types";
 import { targetSemester, targetYearTh } from "@/constant";
 
@@ -50,7 +51,7 @@ export class MyKuQueryInstance {
   }
   refreshCourseData(stdId: string) {
     if (!stdId) throw new Error("stdId is required!");
-    return axios.post(
+    return axios.post<RefreshCourseDataInterface>(
       "https://my.ku.th/myku/api/common/publicCBP",
       JSON.stringify({ keys: [["gcd", stdId]] }),
       {
