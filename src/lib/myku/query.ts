@@ -18,7 +18,10 @@ export class MyKuQueryInstance {
     return axios.get<GetMyCourseResponseInterface>(
       `https://my.ku.th/myku/api/std-profile/getGroupCourse?academicYear=${targetYearTh}&semester=${targetSemester}&stdId=${stdId}`,
       {
-        headers: headers(this.token),
+        headers: headers(
+          this.token,
+          "https://my.ku.th/myku/student/std/classroom"
+        ),
       }
     );
   }
@@ -43,6 +46,19 @@ export class MyKuQueryInstance {
       "https://my.ku.th/myku/api/enroll/searchEnrollResult",
       JSON.stringify({ stdId, semester, academicYear }),
       { headers: headers(this.token) }
+    );
+  }
+  refreshAnything(stdId: string) {
+    if (!stdId) throw new Error("stdId is required!");
+    return axios.post(
+      "https://my.ku.th/myku/api/common/publicCBP",
+      JSON.stringify({ keys: [["gcd", stdId]] }),
+      {
+        headers: headers(
+          this.token,
+          "https://my.ku.th/myku/student/std/classroom"
+        ),
+      }
     );
   }
 }
