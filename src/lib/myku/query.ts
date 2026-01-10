@@ -48,7 +48,7 @@ export class MyKuQueryInstance {
       { headers: headers(this.token) }
     );
   }
-  refreshAnything(stdId: string) {
+  refreshCourseData(stdId: string) {
     if (!stdId) throw new Error("stdId is required!");
     return axios.post(
       "https://my.ku.th/myku/api/common/publicCBP",
