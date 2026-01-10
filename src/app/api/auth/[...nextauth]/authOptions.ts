@@ -185,11 +185,12 @@ export const authOptions: NextAuthOptions = {
           return user;
         } catch (error) {
           if (error instanceof AxiosError) {
-            const r = error.response?.data as {
-              code: string;
-              message: string;
-              user: null;
-            };
+            // const r = error.response?.data as {
+            //   code: string;
+            //   message: string;
+            //   user: null;
+            // };
+            // console.log(r);
             throw new Error("รหัสนิสิต/รหัสผ่านไม่ถูกต้อง");
           }
 
