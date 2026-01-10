@@ -16,7 +16,6 @@ import { formatThaiDate } from "@/utils/date";
 import { groupByDate } from "@/lib/filter";
 import { cn } from "@/lib/utils";
 import { SelectView } from "./SelectView";
-import { ViewMode } from "@/constant";
 import { TableView } from "./table-view";
 import { useIsMobile } from "../useDesktop";
 import { useAtomValue } from "jotai";
