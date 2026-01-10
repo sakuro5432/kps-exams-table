@@ -15,6 +15,7 @@ export enum LogAction {
   SYSTEM_ERROR = "SYSTEM_ERROR",
   USER_EXAM_NOTE_UPDATE = "USER_EXAM_NOTE_UPDATE",
   REQUEST_UPDATE_DATA = "REQUEST_UPDATE_DATA",
+  REFRESH_COURSE_DATA = "REFRESH_COURSE_DATA",
 }
 
 export interface ILogDocument extends Document {
