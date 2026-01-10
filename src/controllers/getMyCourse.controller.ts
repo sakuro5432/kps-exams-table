@@ -5,6 +5,8 @@ import { prisma } from "@/lib/db";
 import { CourseSchedule } from "@/lib/generated/prisma";
 import { timeStringToMinutes, toDayW } from "@/utils/date";
 import { targetPeriod } from "@/constant";
+import { envServer } from "@/env/server.mjs";
+import LogModel, { LogAction } from "@/mongoose/model/Log";
 
 type CourseScheduleWithoutTimestamps = Omit<
   CourseSchedule,
@@ -24,16 +26,26 @@ export async function getMyCourse(
         ...rest.CourseSchedule,
         stdCode,
       }));
-    const res = await app
-      .query(token)
-      .getMyCourse(decodeAccessToken(token).stdid);
+    const { stdid: stdId } = decodeAccessToken(token);
+    const isRefresh = await app.query(token).refreshCourseData(stdId); // refresh data in backend of source app
+    if (envServer.NODE_ENV === "production") {
+      await LogModel.create({
+        stdCode,
+        action: LogAction.REFRESH_COURSE_DATA,
+        success: isRefresh.data.code === "success",
+        ...(isRefresh.data.code !== "success" && {
+          detail: isRefresh.data.message,
+        }),
+      });
+    }
+    const res = await app.query(token).getMyCourse(stdId);
     if (res?.data.code !== "success") return null;
     if (
       !res?.data.results ||
       !Array.isArray(res.data.results) ||
       res.data.results.length === 0
     ) {
-      throw new Error("ไม่พบตารางเรียน");
+      throw new Error("ไม่พบตารางเรียน [getMyCourse]");
     }
     const data = res.data.results.filter((c) =>
       c.peroid_date.includes(targetPeriod)
