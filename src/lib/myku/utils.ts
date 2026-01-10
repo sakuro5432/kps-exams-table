@@ -1,4 +1,4 @@
-export const headers = (token?: string) => {
+export const headers = (token?: string, referer?: string) => {
   const headerObject: Record<string, string> = {
     authority: "myapi.ku.th",
     accept: "*/*",
@@ -6,7 +6,7 @@ export const headers = (token?: string) => {
     "app-key": "txCR5732xYYWDGdd49M3R19o1OVwdRFc",
     "content-type": "application/json",
     origin: "https://my.ku.th",
-    referer: "https://my.ku.th/",
+    referer: referer || "https://my.ku.th/",
     "sec-ch-ua":
       '"Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"',
     "sec-ch-ua-mobile": "?0",
