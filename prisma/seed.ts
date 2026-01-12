@@ -6,11 +6,11 @@ import path from "path";
 import mongoose from "mongoose";
 import UserExamModel from "../src/mongoose/model/UserExam";
 import UserExamPlannerModel from "../src/mongoose/model/UserExamPlanner";
+import { env } from "@/env";
 
 async function resetCache() {
-  const connection = await mongoose.connect(process.env.MONGODB_URI, {
-    dbName:
-      process.env.NODE_ENV === "production" ? "exams" : "exams_development",
+  const connection = await mongoose.connect(env.MONGODB_URI, {
+    dbName: env.NODE_ENV === "production" ? "exams" : "exams_development",
   });
 
   console.time("🧹 Clear Mongo Cache");
@@ -25,7 +25,7 @@ async function resetCache() {
 }
 
 async function seed() {
-  console.log("\nEnvironment:", process.env.NODE_ENV, "\n");
+  console.log("\nEnvironment:", env.NODE_ENV, "\n");
 
   await resetCache();
 

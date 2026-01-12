@@ -1,5 +1,4 @@
 "use server";
-import { envServer } from "@/env/server.mjs";
 import { Auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { revalidateMultiPath } from "@/lib/revalidateMultiPath";

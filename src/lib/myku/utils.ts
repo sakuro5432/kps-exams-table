@@ -1,9 +1,8 @@
-export const headers = (token?: string, referer?: string) => {
+export const headers = (referer?: string, accessToken?: string) => {
   const headerObject: Record<string, string> = {
-    authority: "myapi.ku.th",
+    authority: "my.ku.th",
     accept: "*/*",
     "accept-language": "en-US,en;q=0.9,th-TH;q=0.8,th;q=0.7",
-    "app-key": "txCR5732xYYWDGdd49M3R19o1OVwdRFc",
     "content-type": "application/json",
     origin: "https://my.ku.th",
     referer: referer || "https://my.ku.th/",
@@ -18,8 +17,8 @@ export const headers = (token?: string, referer?: string) => {
       "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
   };
 
-  if (token) {
-    headerObject["x-access-token"] = token;
+  if (accessToken) {
+    headerObject["x-access-token"] = accessToken;
   }
 
   return headerObject;

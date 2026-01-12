@@ -6,7 +6,6 @@ import {
 import React, { useRef, useState } from "react";
 // import dynamic from "next/dynamic";
 import { DownloadScreenshotButton } from "../DownloadScreenshotButton";
-import { envClient } from "@/env/client";
 import { CardView } from "./card-view";
 import { buttonVariants } from "../ui/button";
 import Link from "next/link";
@@ -20,6 +19,7 @@ import { TableView } from "./table-view";
 import { useIsMobile } from "../useDesktop";
 import { useAtomValue } from "jotai";
 import { viewModeAtom } from "@/atoms/viewModeAtom";
+import { env } from "@/env";
 // const RequestUpdateButton = dynamic(
 //   () => import("../RequestUpdateButton").then((x) => x.RequestUpdateButton),
 //   {
@@ -142,7 +142,7 @@ export function ExamScheduleReport({ metadata, data }: Props) {
                   className="text-xs font-medium end-credit"
                   style={{ display: "none" }}
                 >
-                  Reported by : {envClient.BASEURL}
+                  Reported by : {env.NEXT_PUBLIC_BASEURL}
                 </p>
               </div>
               <div className="export-hidden">

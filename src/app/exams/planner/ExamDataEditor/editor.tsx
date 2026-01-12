@@ -24,7 +24,7 @@ import lodash from "lodash";
 import { sectionTypeTranslator } from "@/utils/section";
 import { minutesRangeToTimeStrings } from "@/utils/date";
 import { UserExamPlannerData } from "@/types/userExamPlanner.types";
-import { targetMonth, targetYearEn } from "@/constant";
+import { targetMonth, currentYearEn } from "@/constant";
 type FormValue = z.infer<typeof schema>;
 
 interface Props {
@@ -137,7 +137,7 @@ export function FormEditor({ data, setSelected }: Props) {
                 name={"date"}
                 label="เลือกวันสอบ"
                 targetMonth={targetMonth}
-                targetYear={targetYearEn}
+                targetYear={currentYearEn}
                 disabledNavigation
               />
               <FormTimeRangeInput

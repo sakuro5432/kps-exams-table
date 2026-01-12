@@ -23,17 +23,6 @@ export interface RenewTokenResponseInterface {
   username: string;
 }
 
-export interface GetMyCourseResponseInterface {
-  code: string;
-  results: GroupCourseResponseInterface[];
-  cache: boolean;
-}
-
-export interface GetOpenSubjectResponseInterface {
-  code: string;
-  results: OpenSubjectForEnrollInterface[];
-}
-
 export interface GetStudentEnrollSubject extends EnrollData {}
 
 export interface RefreshCourseDataInterface {

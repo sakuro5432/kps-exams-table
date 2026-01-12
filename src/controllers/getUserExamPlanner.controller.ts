@@ -3,7 +3,6 @@ import { prisma } from "@/lib/db";
 import { UserExamPlannerData } from "@/types/userExamPlanner.types";
 import UserExamPlannerModel from "@/mongoose/model/UserExamPlanner";
 import { $Enums } from "@/lib/generated/prisma";
-import { envServer } from "@/env/server.mjs";
 
 interface Props {
   stdCode: string;

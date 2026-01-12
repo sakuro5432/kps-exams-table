@@ -10,7 +10,6 @@ import LogModel, { LogAction } from "@/mongoose/model/Log";
 import { ExamSchedule } from "@/lib/generated/prisma";
 import { TableSource } from "@/mongoose/enum/TableSource";
 import UserExamPlannerModel from "@/mongoose/model/UserExamPlanner";
-import { envServer } from "@/env/server.mjs";
 type ResponseCode =
   | "UNAUTHORIZED"
   | "NOT_FOUND"

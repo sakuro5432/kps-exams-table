@@ -3,7 +3,6 @@ import { Auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { revalidateMyCourse } from "@/controllers/revalidateMyCourse.controller";
 import { revalidatePath } from "next/cache";
-import { envServer } from "@/env/server.mjs";
 import LogModel, { LogAction } from "@/mongoose/model/Log";
 import { TableSource } from "@/mongoose/enum/TableSource";
 

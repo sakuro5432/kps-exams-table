@@ -2,17 +2,10 @@ import { $Enums } from "@/lib/generated/prisma";
 
 export type RegisteredCourseType = {
   sectionId: number;
-  // groupHeader: string;
-  // weekStartDay: Date;
-  // weekEndDay: Date;
   subjectCode: string;
   subjectNameTh: string;
   sectionCode: string;
   teacherName: string | null;
-  timeFrom: number;
-  timeTo: number;
-  dayW: string;
-  roomNameTh: string;
   sectionType: $Enums.SectionType;
   stdCode: string;
 };

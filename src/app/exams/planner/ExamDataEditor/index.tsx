@@ -25,7 +25,6 @@ import { resetUpdate } from "./reset";
 import { toast } from "react-hot-toast";
 import { UserExamPlannerData } from "@/types/userExamPlanner.types";
 import { formatThaiDate, formatTimeRange } from "@/utils/date";
-import { envClient } from "@/env/client";
 const FormEditor = dynamic(() => import("./editor").then((x) => x.FormEditor), {
   ssr: false,
 });
@@ -131,7 +130,7 @@ function renderListingCard(
 
         {/* Detail content */}
         <div className="p-2 space-y-1 flex-1">
-          {envClient.NODE_ENV === "development" && <div>#{x.sectionId}</div>}
+          {process.env.NODE_ENV === "development" && <div>#{x.sectionId}</div>}
           <div>
             รหัสวิชา: <span className="font-medium">{x.subjectCode} </span>
           </div>

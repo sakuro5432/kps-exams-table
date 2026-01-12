@@ -196,10 +196,6 @@ model CourseSchedule {
   sectionCode   String      @db.VarChar(10)
   sectionType   SectionType @default(LECT)
   teacherName   String?     @db.Text
-  timeFrom      Int         @db.UnsignedInt // e.g., "13.00" = 13 Hour * 60 Minutes = 780 Minutes
-  timeTo        Int         @db.UnsignedInt // e.g., "16.30" = 16.30 Hour * 60 Minutes = 978 Minutes
-  dayW          DayW // e.g., "MON"
-  roomNameTh    String      @db.VarChar(50)
 
   createdAt DateTime  @default(now()) @db.DateTime(0)
   updatedAt DateTime  @updatedAt @db.DateTime(0)

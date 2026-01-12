@@ -7,7 +7,6 @@ import { revalidatePath } from "next/cache";
 import UserExamModel from "@/mongoose/model/UserExam";
 import LogModel, { LogAction } from "@/mongoose/model/Log";
 import { TableSource } from "@/mongoose/enum/TableSource";
-import { envServer } from "@/env/server.mjs";
 
 type ResponseCode =
   | "UNAUTHORIZED"

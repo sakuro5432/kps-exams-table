@@ -1,65 +1,44 @@
 import "server-only";
-import axios from "axios";
 import { headers } from "./utils";
-import {
-  GetStudentEnrollSubject,
-  GetMyCourseResponseInterface,
-  GetOpenSubjectResponseInterface,
-  RefreshCourseDataInterface,
-} from "./types";
-import { targetSemester, targetYearTh } from "@/constant";
+import { GetStudentEnrollSubject, RefreshCourseDataInterface } from "./types";
+import { apiWithAuth } from "@/utils/api";
+import { SearchSubjectDetailInterface } from "@/interfaces/SearchSubjectDetail.interface";
 
 export class MyKuQueryInstance {
-  private token: string;
-  constructor(token: string) {
-    this.token = token;
-  }
-  getMyCourse(stdId: string) {
+  private stdId: string;
+  constructor(stdId: string) {
     if (!stdId) throw new Error("stdId is required!");
-    return axios.get<GetMyCourseResponseInterface>(
-      `https://my.ku.th/myku/api/std-profile/getGroupCourse?academicYear=${targetYearTh}&semester=${targetSemester}&stdId=${stdId}`,
-      {
-        headers: headers(
-          this.token,
-          "https://my.ku.th/myku/student/std/classroom"
-        ),
-      }
-    );
+    this.stdId = stdId;
   }
-  getProfileImage(stdCode: string) {
-    if (!stdCode) throw new Error("stdCode is required!");
-    return axios.get(
-      `https://my.ku.th/myku/api/std-profile/stdimages?stdcode=${stdCode}`,
-      { headers: headers(this.token) }
-    );
-  }
-  getCourseMetadata(subjectCode: string) {
-    if (!subjectCode) throw new Error("subjectCode is required!");
-    return axios.get<GetOpenSubjectResponseInterface>(
-      `https://my.ku.th/myku/api/enroll/openSubjectForEnroll?query=${subjectCode}&academicYear=${targetYearTh}&semester=${targetSemester}&campusCode=K&section=`,
-      { headers: headers(this.token) }
-    );
-  }
-  getEnrollSubject(stdId: string, semester: string, academicYear: string) {
-    if (!stdId || !semester || !academicYear)
+  getEnrollSubject(
+    semester: string,
+    academicYear: string,
+    accessToken?: string
+  ) {
+    if (!semester || !academicYear) {
       throw new Error("stdId | semester | academicYear is required!");
-    return axios.post<GetStudentEnrollSubject>(
-      "https://my.ku.th/myku/api/enroll/searchEnrollResult",
-      JSON.stringify({ stdId, semester, academicYear }),
-      { headers: headers(this.token) }
+    }
+    return apiWithAuth.post<GetStudentEnrollSubject>(
+      "/enroll/searchEnrollResult",
+      JSON.stringify({ stdId: this.stdId, semester, academicYear }),
+      {
+        headers: headers(undefined, accessToken),
+      }
     );
   }
-  refreshCourseData(stdId: string) {
-    if (!stdId) throw new Error("stdId is required!");
-    return axios.post<RefreshCourseDataInterface>(
-      "https://my.ku.th/myku/api/common/publicCBP",
-      JSON.stringify({ keys: [["gcd", stdId]] }),
+  getSubjectDetail(sectionId: string, accessToken?: string) {
+    if (!sectionId) throw new Error("sectionId is required!");
+    return apiWithAuth.get<SearchSubjectDetailInterface>(
+      `/enroll/searchSectionDetail?sectionId=${sectionId}&stdId=${this.stdId}`,
       {
-        headers: headers(
-          this.token,
-          "https://my.ku.th/myku/student/std/classroom"
-        ),
+        headers: headers(undefined, accessToken),
       }
+    );
+  }
+  refreshCourseData() {
+    return apiWithAuth.post<RefreshCourseDataInterface>(
+      "/common/publicCBP",
+      JSON.stringify({ keys: [["gcd", this.stdId]] })
     );
   }
 }

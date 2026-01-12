@@ -5,8 +5,8 @@ import { getMyCourse } from "./getMyCourse.controller";
 import { uniqueBy } from "@/lib/utils";
 import { getSubjectCodesFromCourses } from "@/lib/subjectCode";
 import { filterExamScheduleByStudent } from "@/lib/filter";
-import { envServer } from "@/env/server.mjs";
 import UserExamModel from "@/mongoose/model/UserExam";
+import { env } from "@/env";
 
 export async function revalidateMyCourse(stdCode: string, token: string) {
   try {
@@ -115,7 +115,7 @@ export async function revalidateMyCourse(stdCode: string, token: string) {
         data: dataToCreate,
         skipDuplicates: true, // ป้องกัน insert ซ้ำ (ควรมี unique constraint ด้วย)
       });
-      if (envServer.NODE_ENV == "production") {
+      if (env.NODE_ENV == "production") {
         const isExists = await UserExamModel.findOne({ stdCode }).lean();
         if (isExists) {
           await UserExamModel.deleteOne({ stdCode });

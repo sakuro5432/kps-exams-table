@@ -1,14 +1,13 @@
 import "server-only";
 import crypto from "crypto";
-import axios from "axios";
 import {
-  RenewTokenResponseInterface,
   SignInServicePropsInterface,
   SignInServiceResponseInterface,
 } from "./types";
 import { headers } from "./utils";
 import { MyKuQueryInstance } from "./query";
-import { envServer } from "@/env/server.mjs";
+import { api } from "@/utils/api";
+import { env } from "@/env";
 
 class MyKU {
   constructor() {}
@@ -16,7 +15,7 @@ class MyKU {
     return crypto
       .publicEncrypt(
         {
-          key: envServer.MYKU_PUBLIC_KEY.replace(/\\n/gm, "\n"),
+          key: env.MYKU_PUBLIC_KEY.replace(/\\n/gm, "\n"),
           padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
         },
         Buffer.from(str, "utf8")
@@ -26,8 +25,8 @@ class MyKU {
   login(props: SignInServicePropsInterface) {
     if (!props.username || !props.password)
       throw new Error("username & password is required!");
-    return axios.post<SignInServiceResponseInterface>(
-      "https://my.ku.th/myku/api/v2/user-login/login",
+    return api.post<SignInServiceResponseInterface>(
+      "/v2/user-login/login",
       {
         username: this.encodeString(props.username),
         password: this.encodeString(props.password),
@@ -35,28 +34,20 @@ class MyKU {
       { headers: headers() }
     );
   }
-  renewToken(renewtoken: string) {
-    return axios<RenewTokenResponseInterface>({
-      method: "post",
-      url: `https://myapi.ku.th/auth/renew`,
-      headers: headers(renewtoken),
-      data: {
-        renewtoken: renewtoken,
+  async logout(loginName: string, accesstoken: string) {
+    if (!accesstoken) throw new Error("accesstoken is required!");
+    // loginName start with b
+    return api.post("/v2/user-login/logout", JSON.stringify({ loginName }), {
+      headers: {
+        "x-access-token": accesstoken,
       },
     });
   }
-  async logout(loginName: string, accesstoken: string) {
-    // loginName start with b
-    return axios.post(
-      "https://my.ku.th/myku/api/v2/user-login/logout",
-      JSON.stringify({ loginName }),
-      { headers: headers(accesstoken) }
-    );
-  }
   // query
-  query(token: string) {
-    return new MyKuQueryInstance(token);
+  query(stdId: string) {
+    return new MyKuQueryInstance(stdId);
   }
 }
 
 export const app = new MyKU();
+// app.query(stdId).

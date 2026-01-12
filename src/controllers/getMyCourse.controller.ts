@@ -2,24 +2,27 @@ import "server-only";
 import { decodeAccessToken } from "@/lib/auth";
 import { app } from "@/lib/myku";
 import { prisma } from "@/lib/db";
-import { CourseSchedule } from "@/lib/generated/prisma";
-import { timeStringToMinutes, toDayW } from "@/utils/date";
-import { targetPeriod } from "@/constant";
-import { envServer } from "@/env/server.mjs";
-import LogModel, { LogAction } from "@/mongoose/model/Log";
+import { $Enums, CourseSchedule } from "@/lib/generated/prisma";
+import { targetSemester, academicYear } from "@/constant";
 
 type CourseScheduleWithoutTimestamps = Omit<
   CourseSchedule,
   "createdAt" | "updatedAt" | "deletedAt"
-> & { stdCode: string };
+> & {
+  stdCode: string;
+};
 export async function getMyCourse(
   stdCode: string,
   token: string
 ): Promise<CourseScheduleWithoutTimestamps[] | null> {
   try {
     const registeredCourse = await prisma.registeredCourse.findMany({
-      where: { stdCode, deletedAt: null },
-      include: { CourseSchedule: true },
+      where: { stdCode, deletedAt: null, CourseSchedule: { deletedAt: null } },
+      include: {
+        CourseSchedule: {
+          omit: { createdAt: true, updatedAt: true, deletedAt: true },
+        },
+      },
     });
     if (registeredCourse.length > 0)
       return registeredCourse.map(({ ...rest }) => ({
@@ -27,50 +30,92 @@ export async function getMyCourse(
         stdCode,
       }));
     const { stdid: stdId } = decodeAccessToken(token);
-    const isRefresh = await app.query(token).refreshCourseData(stdId); // refresh data in backend of source app
-    if (envServer.NODE_ENV === "production") {
-      await LogModel.create({
-        stdCode,
-        action: LogAction.REFRESH_COURSE_DATA,
-        success: isRefresh.data.code === "success",
-        ...(isRefresh.data.code !== "success" && {
-          detail: isRefresh.data.message,
-        }),
-      });
-    }
-    const res = await app.query(token).getMyCourse(stdId);
-    if (res?.data.code !== "success") return null;
+    // const isRefresh = await app.query(token, stdId).refreshCourseData(); // refresh data in backend of source app
+    // if (env.NODE_ENV === "production") {
+    //   await LogModel.create({
+    //     stdCode,
+    //     action: LogAction.REFRESH_COURSE_DATA,
+    //     success: isRefresh.data.code === "success",
+    //     ...(isRefresh.data.code !== "success" && {
+    //       detail: isRefresh.data.message,
+    //     }),
+    //   });
+    // }
+    const res = await app
+      .query(stdId)
+      .getEnrollSubject(
+        targetSemester.toString(),
+        academicYear.toString(),
+        token
+      );
+    if (res?.data.code !== "success")
+      throw new Error("ไม่สามารถดึงข้อมูลตารางเรียนได้");
     if (
-      !res?.data.results ||
-      !Array.isArray(res.data.results) ||
-      res.data.results.length === 0
+      !res?.data.enrollSubjects ||
+      !Array.isArray(res.data.enrollSubjects) ||
+      res.data.enrollSubjects.length === 0
     ) {
-      throw new Error("ไม่พบตารางเรียน [getMyCourse]");
-    }
-    const data = res.data.results.filter((c) =>
-      c.peroid_date.includes(targetPeriod)
-    );
-    if (data.length === 0) {
-      throw new Error(`ไม่พบตารางเรียนช่วง ${targetPeriod}`);
+      throw new Error("ไม่พบการลงทะเบียนเรียนวิชาใดๆ (1)");
     }
 
-    if (!data[0].course || data[0].course.length === 0) {
-      throw new Error(`พบตารางเรียน ${targetPeriod}, แต่ข้อมูลไม่สมบูรณ์`);
+    const data = res.data.enrollSubjects.filter(
+      (c) => c.approveStatus === "A" && c.enrollStatus === "A"
+    );
+    if (data.length === 0) {
+      throw new Error(`ไม่พบการลงทะเบียนเรียนวิชาใดๆ (2)`);
     }
-    return data[0].course.map((course) => ({
-      sectionId: course.section_id, // Ensure this is unique
-      subjectCode: course.subject_code,
-      subjectNameTh: course.subject_name_th,
-      sectionCode: course.section_code,
-      teacherName: course.teacher_name || null, // Handle optional field
-      timeFrom: timeStringToMinutes(course.time_from),
-      timeTo: timeStringToMinutes(course.time_to),
-      dayW: toDayW(course.day_w),
-      roomNameTh: course.room_name_th,
-      sectionType: course.section_type === "16902" ? "LAB" : "LECT",
-      stdCode,
-    }));
+
+    // 1. ดึง sectionId ออกมาให้ชัด
+    const sectionIdAndSubjectCodes = data.map((x) => x.sectionId);
+    // 2. ยิง API พร้อมกัน + ผูก sectionId ไปกับ response
+    const sectionDetailMap = new Map<
+      number,
+      Awaited<
+        ReturnType<ReturnType<typeof app.query>["getSubjectDetail"]>
+      >["data"]["sectionDetail"]
+    >();
+
+    await Promise.all(
+      sectionIdAndSubjectCodes.map(async (sectionId) => {
+        const res = await app
+          .query(stdId)
+          .getSubjectDetail(sectionId.toString(), token);
+
+        if (res.data.code === "success" && res.data.sectionDetail) {
+          sectionDetailMap.set(sectionId, res.data.sectionDetail);
+        }
+      })
+    );
+
+    // 3. ตรวจว่ามีข้อมูลจริง
+    if (sectionDetailMap.size === 0) {
+      throw new Error("ไม่พบการลงทะเบียนเรียนวิชาใดๆ (3)");
+    }
+    const result: CourseScheduleWithoutTimestamps[] = data.flatMap((course) => {
+      const detail = sectionDetailMap.get(course.sectionId);
+      if (!detail) return [];
+
+      return [
+        {
+          sectionId: course.sectionId,
+          subjectCode: course.subjectCode,
+          subjectNameTh: course.subjectNameTh,
+          sectionCode: course.sectionCode,
+          teacherName: detail.teacher.map((x) => x.nameTh.trim()).join(","),
+          sectionType:
+            course.sectionType === "16902"
+              ? $Enums.SectionType.LAB
+              : $Enums.SectionType.LECT,
+          stdCode,
+        },
+      ];
+    });
+    // console.log(result);
+    return result;
   } catch (error) {
-    return null;
+    // if (error instanceof AxiosError) {
+    //   console.log(error.request);
+    // }
+    throw error;
   }
 }

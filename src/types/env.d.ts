@@ -2,6 +2,9 @@ declare global {
   namespace NodeJS {
     interface ProcessEnv {
       MYKU_PUBLIC_KEY: string;
+      NEXT_PUBLIC_MYKU_APP_KEY: string;
+      NEXT_PUBLIC_MYKU_API_URL: string;
+
       DATABASE_URL: string;
       MONGODB_URI: string;
       NEXTAUTH_SECRET: string;

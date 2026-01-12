@@ -1,8 +1,8 @@
 import "server-only";
 import { prisma } from "../lib/db";
 import UserExamModel from "@/mongoose/model/UserExam";
-import { envServer } from "@/env/server.mjs";
 import { ExamScheduleDataType } from "@/types/schedule.types";
+import { env } from "@/env";
 
 export async function getMyExamSchedule(stdCode: string): Promise<{
   data: ExamScheduleDataType[];
@@ -13,7 +13,7 @@ export async function getMyExamSchedule(stdCode: string): Promise<{
   //   select: { requestUpdateAt: true },
   // });
   // const requestUpdateAt = user?.requestUpdateAt || null;
-  if (envServer.NODE_ENV == "production") {
+  if (env.NODE_ENV == "production") {
     const cache = await UserExamModel.findOne({ stdCode }).lean();
     if (cache) {
       return {
@@ -26,7 +26,7 @@ export async function getMyExamSchedule(stdCode: string): Promise<{
   const data = await getUserExamSchedule(stdCode);
 
   // อัพเดตหรือสร้าง cache ใน MongoDB
-  if (envServer.NODE_ENV == "production") {
+  if (env.NODE_ENV == "production") {
     await UserExamModel.findOneAndUpdate(
       { stdCode },
       { stdCode, exams: data },

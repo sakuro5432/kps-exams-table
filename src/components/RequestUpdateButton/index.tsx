@@ -3,7 +3,6 @@ import { Button } from "../ui/button";
 import { useState } from "react";
 import { action } from "@/components/RequestUpdateButton/action";
 import { toast } from "react-hot-toast";
-import { envClient } from "@/env/client";
 
 interface Props {
   isRequestable: { disabled: boolean; message: string };
@@ -11,7 +10,7 @@ interface Props {
 
 export function RequestUpdateButton({ isRequestable }: Props) {
   const [isDisabled, setIsDisabled] = useState(
-    envClient.NODE_ENV === "production" ? isRequestable.disabled : false
+    process.env.NODE_ENV === "production" ? isRequestable.disabled : false
   );
 
   const handleClick = async () => {

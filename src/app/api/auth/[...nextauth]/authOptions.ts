@@ -185,6 +185,7 @@ export const authOptions: NextAuthOptions = {
           return user;
         } catch (error) {
           if (error instanceof AxiosError) {
+            // console.log(error.response?.data)
             // const r = error.response?.data as {
             //   code: string;
             //   message: string;
@@ -234,6 +235,7 @@ export const authOptions: NextAuthOptions = {
         });
         if (registeredCourse === 0) {
           try {
+            console.log("RUN!!!");
             await revalidateMyCourse(user.id, user.accesstoken);
           } catch (error) {
             console.error("Error collecting and saving courses:", error);
@@ -272,7 +274,7 @@ export const authOptions: NextAuthOptions = {
           stdCode: token.id,
           action: LogAction.LOGOUT,
         });
-        app.logout(token.studentInfo.loginName, token.sessionId);
+        app.logout(token.studentInfo.loginName, token.accesstoken);
       } catch (error) {
         console.error("Error in signOut event:", error);
       }
@@ -285,13 +287,6 @@ export const authOptions: NextAuthOptions = {
           session.user.forceLogout = true;
           // token can't re-assign here
         }
-        // if (
-        //   envServer.NODE_ENV === "production" &&
-        //   Math.floor(Date.now() / 1000) >
-        //     Number(decodeJwt(token.sessionId).exp)
-        // ) {
-        //   session.user.forceLogout = true;
-        // }
       } catch (error) {
         console.error("Error in session event:", error);
       }

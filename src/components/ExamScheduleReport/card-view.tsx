@@ -4,7 +4,6 @@ import { BadgeSectionCode } from "../BadgeSectionCode";
 import { sectionTypeTranslator } from "@/utils/section";
 import { formatTimeRange } from "@/utils/date";
 import { cn } from "@/lib/utils";
-import { envClient } from "@/env/client";
 
 interface Props {
   data: ExamScheduleDataType & { groupId: number | null; isOverlap: boolean };
@@ -23,7 +22,7 @@ export function CardView({ data, activeGroup, setActiveGroup }: Props) {
       onMouseEnter={() => data.groupId && setActiveGroup(data.groupId)}
       onMouseLeave={() => setActiveGroup(null)}
     >
-      {envClient.NODE_ENV === "development" && <div>#{data.sectionId}</div>}
+      {process.env.NODE_ENV === "development" && <div>#{data.sectionId}</div>}
       <div>
         เวลา:{" "}
         <span className="font-semibold">
